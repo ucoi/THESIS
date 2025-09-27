@@ -10,13 +10,17 @@ const Container = styled.div`
   background: ${(theme) => theme.bg};
   color: ${(theme) => theme.text_primary};
   overflow-x: hidden;
+  overflow-y: hidden;
+  transition: all 0.2s ease;
 `;
 
 function App() {
   return (
     <ThemeProvider theme={lightTheme}>
       <BrowserRouter>
-        <Container>hello</Container>
+        <Container>
+          <Authentication />
+        </Container>
       </BrowserRouter>
     </ThemeProvider>
   );
