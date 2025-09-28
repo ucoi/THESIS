@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import LogoImage from "../utils/Images/Logo.png";
 import AuthImage from "../utils/Images/AuthImage.jpg";
+import SignIn from "../components/SignIn";
+import SignUp from "../components/SignUp";
 
 const Container = styled.div`
   flex: 1;
@@ -67,18 +69,20 @@ const Authentication = () => {
         <Image src={AuthImage} />
       </Left>
       <Right>
-        {login ? (
+        {!login ? (
           <>
+            <SignIn />
             <Text>
-              Dont have an account ?{" "}
-              <TextButton onClick={() => setLogin(false)}>SignUp</TextButton>
+              Don't have an account ?{" "}
+              <TextButton onClick={() => setLogin(true)}>SignUp</TextButton>
             </Text>
           </>
         ) : (
           <>
+            <SignUp />
             <Text>
               Already have an account ?
-              <TextButton onClick={() => setLogin(true)}>LogIn</TextButton>
+              <TextButton onClick={() => setLogin(false)}>LogIn</TextButton>
             </Text>
           </>
         )}

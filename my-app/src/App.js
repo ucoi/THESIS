@@ -1,7 +1,7 @@
 import styled, { ThemeProvider } from "styled-components";
 import { lightTheme } from "./utils/Themes";
 import { BrowserRouter } from "react-router-dom";
-import Authentication from "./pages/Authentication.jsx";
+import Authentication from "./pages/Authentication";
 
 const Container = styled.div`
   width: 100;
@@ -16,12 +16,19 @@ const Container = styled.div`
 `;
 
 function App() {
+  const [user, setUser] = useState(true);
   return (
     <ThemeProvider theme={lightTheme}>
       <BrowserRouter>
-        <Container>
-          <Authentication />
-        </Container>
+        {user ? (
+          <Container>
+            <Navbar />
+          </Container>
+        ) : (
+          <Container>
+            <Authentication />
+          </Container>
+        )}
       </BrowserRouter>
     </ThemeProvider>
   );
