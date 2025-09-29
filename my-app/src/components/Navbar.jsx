@@ -1,11 +1,13 @@
 import React from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import { Link as LinkR, NavLink } from "react-router-dom";
 import LogoImage from "../utils/Images/Logo.png";
 import { MenuRounded } from "@mui/icons-material";
+import Avatar from "@mui/material/Avatar";
 
 const Nav = styled.nav`
-  background-color: ${({ theme }) => theme.bg};
+  background: #d3d3d3; /* Darker grey background */
   height: 80px;
   display: flex;
   align-items: center;
@@ -78,18 +80,81 @@ const Navlink = styled(NavLink)`
     border-bottom: 2px solid ${({ theme }) => theme.accent || "#007BFF"};
   }
 `;
+const UserContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  align-items: center;
+  padding: 0 6px;
+  color: ${({ theme }) => theme.primary};
+`;
+const TextButton = styled.button`
+  background: ${({ theme }) => theme.accent || "#007BFF"}; /* Accent color */
+  color: white;
+  border: none;
+  border-radius: 4px; /* Rounded corners */
+  padding: 8px 16px; /* Add padding */
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: ${({ theme }) =>
+      theme.accentHover || "#0056b3"}; /* Darker hover color */
+    transform: scale(1.05); /* Slight zoom effect */
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 4px ${({ theme }) => theme.accent || "#007BFF"}; /* Focus effect */
+  }
+`;
+
+const MobileMenu = styled.ul`
+  flex-direction: column;
+  align-items: start;
+  gap: 16px;
+  padding: 12px 40px 24px 40px;
+  list-style: none;
+  width: 90%;
+  background: ${({ theme }) => theme.bg};
+  position: absolute;
+  top: 80px;
+  right: 0;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+
+  transform: ${({ isOpen }) =>
+    isOpen ? "translateY(0)" : "translateY(-20px)"};
+  opacity: ${({ isOpen }) => (isOpen ? "1" : "0")};
+  pointer-events: ${({ isOpen }) => (isOpen ? "auto" : "none")};
+  transition: transform 0.3s ease, opacity 0.3s ease;
+`;
 
 const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <Nav>
       <NavContainer>
-        <Mobileicon>
+        <Mobileicon onClick={() => setIsOpen(!isOpen)}>
           <MenuRounded sx={{ color: "inherit", fontSize: "32px" }} />
         </Mobileicon>
         <NavLogo to="/">
           <Logo src={LogoImage} />
           Fittracker
         </NavLogo>
+
+        <MobileMenu isOpen={isOpen}>
+          <Navlink to="/dashboard">Dashboard</Navlink>
+          <Navlink to="/Workouts">Workouts</Navlink>
+          <Navlink to="/tutorials">tutorials</Navlink>
+          <Navlink to="/blogs">blogs</Navlink>
+          <Navlink to="/contact">contact</Navlink>
+        </MobileMenu>
         <NavItems>
           <Navlink to="/dashboard">Dashboard</Navlink>
           <Navlink to="/Workouts">Workouts</Navlink>
@@ -97,6 +162,10 @@ const Navbar = () => {
           <Navlink to="/blogs">blogs</Navlink>
           <Navlink to="/contact">contact</Navlink>
         </NavItems>
+        <UserContainer>
+          <Avatar />
+          <TextButton>Logout</TextButton>
+        </UserContainer>
       </NavContainer>
     </Nav>
   );
