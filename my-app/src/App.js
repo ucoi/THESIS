@@ -2,6 +2,8 @@ import styled, { ThemeProvider } from "styled-components";
 import { lightTheme } from "./utils/Themes";
 import { BrowserRouter } from "react-router-dom";
 import Authentication from "./pages/Authentication";
+import Navbar from "./components/Navbar";
+import { useState } from "react";
 
 const Container = styled.div`
   width: 100;
