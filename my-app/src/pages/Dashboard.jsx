@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { counts } from "../utils/data";
 import CountsCard from "../components/cards/CountCard";
+import WeeklysStat from "../components/cards/WeeklystatCard";
 const Container = styled.div`
   flex: 1;
   height: 100%;
