@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import CountsCard from "../components/cards/CountCard";
 import WeeklysStatCard from "../components/cards/WeeklystatCard";
+import CategoryChart from "../components/cards/CategoryChart";
 
 const Container = styled.div`
   flex: 1;
@@ -73,6 +74,7 @@ const Dashboard = () => {
       bg: "#E6FFE6",
       icon: "⚡",
     },
+    
   ];
 
   // Numeric values for the keys
@@ -93,6 +95,7 @@ const Dashboard = () => {
         </FlexWrap>
         <FlexWrap>
           <WeeklysStatCard data={dataValues} />
+          <CategoryChart data={dataValues} />
         </FlexWrap>
       </Wrapper>
     </Container>
