@@ -3,6 +3,8 @@ import styled from "styled-components";
 import CountsCard from "../components/cards/CountCard";
 import WeeklysStatCard from "../components/cards/WeeklystatCard";
 import CategoryChart from "../components/cards/CategoryChart";
+import AddWorkout from "../components/AddWorkout";
+import WorkoutCard from "../components/cards/WorkoutCard";
 
 const Container = styled.div`
   flex: 1;
@@ -41,8 +43,29 @@ const FlexWrap = styled.div`
     gap: 12px;
   }
 `;
+const Section = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 0px 16px;
+  gap: 22px;
+  padding: 0px 16px;
+  @media (max-width: 600px) {
+    gap: 12px;
+  }
+`;
+const CardWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 100px;
+  @media (max-width: 600px) {
+    gap: 12px;
+  }
+`;
 
 const Dashboard = () => {
+  const [workouts, setWorkouts] = React.useState([]);
   const data = [
     {
       id: 1, // Unique ID
@@ -74,7 +97,6 @@ const Dashboard = () => {
       bg: "#E6FFE6",
       icon: "⚡",
     },
-    
   ];
 
   // Numeric values for the keys
@@ -96,7 +118,17 @@ const Dashboard = () => {
         <FlexWrap>
           <WeeklysStatCard data={dataValues} />
           <CategoryChart data={dataValues} />
+          <AddWorkout />
         </FlexWrap>
+
+        <Section>
+          <Title>Recent Workouts</Title>
+          <CardWrapper>
+            <WorkoutCard />
+            <WorkoutCard />
+            <WorkoutCard />
+          </CardWrapper>
+        </Section>
       </Wrapper>
     </Container>
   );
