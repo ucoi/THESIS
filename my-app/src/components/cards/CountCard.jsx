@@ -76,6 +76,7 @@ const Span = styled.span`
   ${({ positive, theme }) =>
     positive ? `color: ${theme.green};` : `color: ${theme.red};`}
 `;
+
 const Desc = styled.div`
   font-size: 14px;
   color: ${({ theme }) => theme.text_secondary};
@@ -84,13 +85,14 @@ const Desc = styled.div`
     font-size: 8px;
   }
 `;
-const CountCard = ({ item }) => {
+
+const CountCard = ({ item, data }) => {
   return (
     <Card>
       <Left>
         <Title>{item.name}</Title>
         <Value>
-          123
+          {data && data[item.Key]?.toFixed(2)}
           <Unit>{item.unit}</Unit>
           <Span positive>(+10%)</Span>
         </Value>
