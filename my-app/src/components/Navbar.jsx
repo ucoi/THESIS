@@ -145,7 +145,7 @@ const Navbar = () => {
         </Mobileicon>
         <NavLogo to="/">
           <Logo src={LogoImage} />
-          Fittracker
+          FT
         </NavLogo>
 
         <MobileMenu isOpen={isOpen}>

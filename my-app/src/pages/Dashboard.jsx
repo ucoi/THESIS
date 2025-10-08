@@ -65,7 +65,6 @@ const CardWrapper = styled.div`
 `;
 
 const Dashboard = () => {
-  const [workouts, setWorkouts] = React.useState([]);
   const data = [
     {
       id: 1, // Unique ID
