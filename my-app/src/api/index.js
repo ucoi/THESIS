@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:8080/api",
+  baseURL: "http://localhost:8080",
 });
 
 export const UserSignUp = (data) => API.post("/user/signup", data);
@@ -16,7 +16,7 @@ export const getWorkouts = (token, date) =>
   API.get("/user/workout", {
     headers: { Authorization: `Bearer ${token}` },
     params: { date },
-  }); 
+  });
 
 export const addWorkout = (token, data) =>
   API.post("/user/workout", data, {
