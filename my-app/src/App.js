@@ -7,6 +7,7 @@ import { useState } from "react";
 import Dashboard from "./pages/Dashboard";
 import Workouts from "./pages/Workouts";
 import { Routes, Route } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Container = styled.div`
   width: 100;
@@ -21,13 +22,13 @@ const Container = styled.div`
 `;
 
 function App() {
-  const [user, setUser] = useState(true);
+  const {currentUser} = useSelector((state) => state.user);
   return (
     <ThemeProvider theme={lightTheme}>
       <BrowserRouter>
-        {user ? (
+        {currentUser ? (
           <Container>
-            <Navbar />
+            <Navbar currentUser={currentUser} />
             <Routes>
               <Route path="/Dashboard" element={<Dashboard />} />
               <Route path="/Workouts" element={<Workouts />} />
