@@ -22,3 +22,16 @@ export const addWorkout = (token, data) =>
   API.post("/user/workout", data, {
     headers: { Authorization: `Bearer ${token}` },
   });
+
+const token = "YOUR_TOKEN";
+axios
+  .post(
+    "http://localhost:8080/user/workout",
+    {
+      category: "legs",
+      workout: "squat 3x8",
+    },
+    { headers: { Authorization: `Bearer ${token}` } }
+  )
+  .then((res) => console.log(res.data))
+  .catch((err) => console.error(err?.response?.data || err));
