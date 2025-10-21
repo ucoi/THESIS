@@ -7,58 +7,39 @@ import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/reducer/userSlice";
 import { useNavigate } from "react-router-dom";
 
-const Wrapper = styled.div`
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(
-    135deg,
-    ${({ theme }) => theme.bgLight || "#f3f4f6"} 0%,
-    ${({ theme }) => theme.bgDark || "#e5e7eb"} 100%
-  );
-`;
-
 const Container = styled.div`
   width: 100%;
-  max-width: 420px;
-  background: ${({ theme }) => theme.card || "#fff"};
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  border-radius: 16px;
-  padding: 48px 40px;
+  max-width: 500px;
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
-  }
+  gap: 36px;
+  margin: 0 auto;
+  padding: 60px 20px;
 `;
 
-const Header = styled.div`
-  text-align: center;
-`;
-
-const Title = styled.h1`
-  font-size: 32px;
+const Title = styled.div`
+  font-size: 30px;
   font-weight: 800;
-  color: ${({ theme }) => theme.text_primary || "#111"};
-  margin-bottom: 8px;
+  color: ${({ theme }) => theme.text_primary};
 `;
 
-const Subtitle = styled.p`
-  font-size: 15px;
-  color: ${({ theme }) => theme.text_secondary || "#6b7280"};
-  margin: 0;
+const Span = styled.div`
+  font-size: 16px;
+  font-weight: 400;
+  color: ${({ theme }) => theme.text_secondary + 90};
 `;
 
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+const BottomText = styled.p`
+  font-size: 14px;
+  text-align: center;
+  color: ${({ theme }) => theme.text_secondary + 90};
+  margin-top: 10px;
+
+  span {
+    color: #2563eb;
+    font-weight: 600;
+    cursor: pointer;
+  }
 `;
 
 const SignIn = () => {
@@ -66,6 +47,7 @@ const SignIn = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [buttonDisabled, setButtonDisabled] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -78,78 +60,53 @@ const SignIn = () => {
   };
 
   const handleSignIn = async () => {
-    if (!validateInputs()) return;
     setLoading(true);
-    try {
-      const res = await UserSignIn({ email, password });
-      dispatch(loginSuccess(res.data));
-      alert("Welcome back!");
-      navigate("/dashboard");
-    } catch (err) {
-      alert(err.response?.data?.message || "Login failed, please try again");
-    } finally {
-      setLoading(false);
+    setButtonDisabled(true);
+
+    if (validateInputs()) {
+      try {
+        const res = await UserSignIn({ email, password });
+        dispatch(loginSuccess(res.data));
+        alert("Login Success");
+        navigate("/dashboard");
+      } catch (err) {
+        alert(err.response?.data?.message || "Something went wrong");
+      } finally {
+        setLoading(false);
+        setButtonDisabled(false);
+      }
     }
   };
 
   return (
-    <Wrapper>
-      <Container>
-        <Header>
-          <Title>Welcome to FitTrack 👋</Title>
-          <Subtitle>Log in to continue your fitness journey</Subtitle>
-        </Header>
+    <Container>
+      <div>
+        <Title>Welcome to FitTrack 👋</Title>
+        <Span>Please login with your details here</Span>
+      </div>
 
-        <Form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSignIn();
-          }}
-        >
-          <TextInput
-            label="Email Address"
-            placeholder="Enter your email"
-            value={email}
-            handleChange={(e) => setEmail(e.target.value)}
-          />
-          <TextInput
-            label="Password"
-            placeholder="Enter your password"
-            password
-            value={password}
-            handleChange={(e) => setPassword(e.target.value)}
-          />
-          <Button
-            text={loading ? "Signing In..." : "Sign In"}
-            onClick={handleSignIn}
-            isLoading={loading}
-            isDisabled={loading}
-            type="submit"
-          />
-        </Form>
-
-        <p
-          style={{
-            textAlign: "center",
-            fontSize: "14px",
-            color: "#6b7280",
-            marginTop: "10px",
-          }}
-        >
-          Don’t have an account?{" "}
-          <span
-            style={{
-              color: "#2563eb",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-            onClick={() => navigate("/signup")}
-          >
-            Sign up
-          </span>
-        </p>
-      </Container>
-    </Wrapper>
+      <div style={{ display: "flex", gap: "20px", flexDirection: "column" }}>
+        <TextInput
+          label="Email Address"
+          placeholder="Enter your email address"
+          value={email}
+          handleChange={(e) => setEmail(e.target.value)}
+        />
+        <TextInput
+          label="Password"
+          placeholder="Enter your password"
+          password
+          value={password}
+          handleChange={(e) => setPassword(e.target.value)}
+        />
+        <Button
+          text={loading ? "Signing in..." : "Sign In"}
+          onClick={handleSignIn}
+          isLoading={loading}
+          isDisabled={buttonDisabled}
+        />
+      </div>
+    </Container>
   );
 };
 
