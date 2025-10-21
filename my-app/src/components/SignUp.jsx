@@ -5,6 +5,7 @@ import Button from "./Button";
 import { UserSignUp } from "../api";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/reducer/userSlice";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   width: 100%;
@@ -46,7 +47,9 @@ const Form = styled.div`
 
 const SignUp = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -63,16 +66,22 @@ const SignUp = () => {
   const handleSignUp = async () => {
     if (!validateInputs()) return;
 
-    setLoading(true);
+    setButtonLoading(true);
     setButtonDisabled(true);
     try {
       const res = await UserSignUp({ name, email, password });
-      dispatch(loginSuccess(res.data));
-      alert("🎉 Account created successfully!");
+
+      // Store token in Redux and localStorage
+      dispatch(loginSuccess({ token: res.data.token, user: res.data.user }));
+      localStorage.setItem("token", res.data.token);
+
+      alert("Account Created Successfully");
+      navigate("/dashboard");
     } catch (err) {
-      alert(err.response?.data?.message || "Something went wrong");
+      console.error("SignUp error:", err);
+      alert(err.response?.data?.message || "Signup failed");
     } finally {
-      setLoading(false);
+      setButtonLoading(false);
       setButtonDisabled(false);
     }
   };
@@ -107,7 +116,7 @@ const SignUp = () => {
         <Button
           text="Sign Up"
           onClick={handleSignUp}
-          isLoading={loading}
+          isLoading={buttonLoading}
           isDisabled={buttonDisabled}
         />
       </Form>

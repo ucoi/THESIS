@@ -47,6 +47,7 @@ const SignIn = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -60,21 +61,23 @@ const SignIn = () => {
   };
 
   const handleSignIn = async () => {
-    setLoading(true);
+    setButtonLoading(true);
     setButtonDisabled(true);
+    try {
+      const res = await UserSignIn({ email, password });
 
-    if (validateInputs()) {
-      try {
-        const res = await UserSignIn({ email, password });
-        dispatch(loginSuccess(res.data));
-        alert("Login Success");
-        navigate("/dashboard");
-      } catch (err) {
-        alert(err.response?.data?.message || "Something went wrong");
-      } finally {
-        setLoading(false);
-        setButtonDisabled(false);
-      }
+      // Store token in Redux and localStorage
+      dispatch(loginSuccess({ token: res.data.token, user: res.data.user }));
+      localStorage.setItem("token", res.data.token);
+
+      alert("SignIn Successful");
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("SignIn error:", err);
+      alert(err.response?.data?.message || "Login failed");
+    } finally {
+      setButtonDisabled(false);
+      setButtonLoading(false);
     }
   };
 
@@ -100,9 +103,9 @@ const SignIn = () => {
           handleChange={(e) => setPassword(e.target.value)}
         />
         <Button
-          text={loading ? "Signing in..." : "Sign In"}
+          text={buttonLoading ? "Signing in..." : "Sign In"}
           onClick={handleSignIn}
-          isLoading={loading}
+          isLoading={buttonLoading}
           isDisabled={buttonDisabled}
         />
       </div>

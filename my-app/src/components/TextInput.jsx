@@ -134,11 +134,13 @@ const TextInput = ({
   value,
   error,
   handleChange,
+  handelChange,
+  onChange,
   textArea,
   rows,
   columns,
   chipableInput,
-  chipableArray,
+  chipableArray = [],
   removeChip,
   height,
   small,
@@ -146,6 +148,7 @@ const TextInput = ({
   password,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const changeHandler = handleChange || handelChange || onChange || (() => {});
   return (
     <Container small={small}>
       <Label small={small} popup={popup} error={error}>
@@ -173,7 +176,7 @@ const TextInput = ({
               placeholder={placeholder}
               name={name}
               value={value}
-              onChange={(e) => handleChange(e)}
+              onChange={(e) => changeHandler(e)}
             />
           </ChipWrapper>
         ) : (
@@ -187,19 +190,15 @@ const TextInput = ({
               columns={columns}
               placeholder={placeholder}
               value={value}
-              onChange={(e) => handleChange(e)}
+              onChange={(e) => changeHandler(e)}
               type={password && !showPassword ? "password" : "text"}
             />
             {password && (
               <>
                 {showPassword ? (
-                  <>
-                    <Visibility onClick={() => setShowPassword(false)} />
-                  </>
+                  <Visibility onClick={() => setShowPassword(false)} />
                 ) : (
-                  <>
-                    <VisibilityOff onClick={() => setShowPassword(true)} />
-                  </>
+                  <VisibilityOff onClick={() => setShowPassword(true)} />
                 )}
               </>
             )}

@@ -6,7 +6,7 @@ import WeeklyStatCard from "../components/cards/WeeklystatCard";
 import CategoryChart from "../components/cards/CategoryChart";
 import AddWorkout from "../components/AddWorkout";
 import WorkoutCard from "../components/cards/WorkoutCard";
-import { addWorkout, getDashboardDetails, getWorkouts } from "../api";
+import { getDashboardDetails, getWorkouts } from "../api";
 
 const Container = styled.div`
   flex: 1;
@@ -47,7 +47,6 @@ const Section = styled.div`
   flex-direction: column;
   padding: 0px 16px;
   gap: 22px;
-  padding: 0px 16px;
   @media (max-width: 600px) {
     gap: 12px;
   }
@@ -68,56 +67,54 @@ const Dashboard = () => {
   const [data, setData] = useState();
   const [buttonLoading, setButtonLoading] = useState(false);
   const [todaysWorkouts, setTodaysWorkouts] = useState([]);
-  const [workout, setWorkout] = useState(`#Legs
--Back Squat
--5 setsX15 reps
--30 kg
--10 min`);
+  const [workout, setWorkout] = useState("");
 
   const dashboardData = async () => {
     setLoading(true);
-    const token = localStorage.getItem("fittrack-app-token");
-    await getDashboardDetails(token).then((res) => {
+    try {
+      const res = await getDashboardDetails();
+      console.log("Dashboard data refreshed:", res.data); // 👈 ADD THIS
       setData(res.data);
-      console.log(res.data);
+    } catch (err) {
+      console.error("Dashboard error:", err);
+      alert(err?.response?.data?.message || "Failed to load dashboard");
+    } finally {
       setLoading(false);
-    });
+    }
   };
+
   const getTodaysWorkout = async () => {
     setLoading(true);
-    const token = localStorage.getItem("fittrack-app-token");
-    await getWorkouts(token, "").then((res) => {
-      setTodaysWorkouts(res?.data?.todaysWorkouts);
-      console.log(res.data);
+    try {
+      const res = await getWorkouts("");
+      console.log("Today's workouts refreshed:", res?.data?.todaysWorkouts); // 👈 ADD THIS
+      setTodaysWorkouts(res?.data?.todaysWorkouts || []);
+    } catch (err) {
+      console.error("Get workouts error:", err);
+    } finally {
       setLoading(false);
-    });
+    }
   };
 
   const addNewWorkout = async () => {
-    setButtonLoading(true);
-    const token = localStorage.getItem("fittrack-app-token");
-    await addWorkout(token, { workoutString: workout })
-      .then((res) => {
-        dashboardData();
-        getTodaysWorkout();
-        setButtonLoading(false);
-      })
-      .catch((err) => {
-        alert(err);
-      });
+    console.log("addNewWorkout callback triggered"); // 👈 ADD THIS
+    // Refresh both dashboard data and today's workouts
+    await dashboardData();
+    await getTodaysWorkout();
   };
 
   useEffect(() => {
     dashboardData();
     getTodaysWorkout();
   }, []);
+
   return (
     <Container>
       <Wrapper>
         <Title>Dashboard</Title>
         <FlexWrap>
           {counts.map((item) => (
-            <CountsCard item={item} data={data} />
+            <CountsCard key={item.name} item={item} data={data} />
           ))}
         </FlexWrap>
 
@@ -136,7 +133,7 @@ const Dashboard = () => {
           <Title>Todays Workouts</Title>
           <CardWrapper>
             {todaysWorkouts.map((workout) => (
-              <WorkoutCard workout={workout} />
+              <WorkoutCard key={workout._id} workout={workout} />
             ))}
           </CardWrapper>
         </Section>

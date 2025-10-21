@@ -2,23 +2,38 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   currentUser: null,
+  token: localStorage.getItem("token") || null,
+  loading: false,
+  error: false,
 };
 
-export const userSlice = createSlice({
+const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
+    loginStart: (state) => {
+      state.loading = true;
+    },
     loginSuccess: (state, action) => {
+      state.loading = false;
       state.currentUser = action.payload.user;
-      localStorage.setItem("fittrack-app-token", action.payload.token);
+      state.token = action.payload.token;
+      state.error = false;
+    },
+    loginFailure: (state) => {
+      state.loading = false;
+      state.error = true;
     },
     logout: (state) => {
       state.currentUser = null;
-      localStorage.removeItem("fittrack-app-token"); 
+      state.token = null;
+      state.loading = false;
+      state.error = false;
+      localStorage.removeItem("token");
     },
   },
 });
 
-export const { loginSuccess, logout } = userSlice.actions;
-
+export const { loginStart, loginSuccess, loginFailure, logout } =
+  userSlice.actions;
 export default userSlice.reducer;
