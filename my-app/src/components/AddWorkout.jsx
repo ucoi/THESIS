@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { useSelector } from "react-redux";
-import { addWorkout as apiAddWorkout } from "../api/index.js";
 import TextInput from "./TextInput";
 import Button from "./Button";
+import { addWorkout as apiAddWorkout } from "../api";
 import { useNavigate } from "react-router-dom";
 
 const Card = styled.div`
@@ -15,11 +14,12 @@ const Card = styled.div`
   box-shadow: 1px 6px 20px 0px ${({ theme }) => theme.primary + 15};
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 12px;
   @media (max-width: 600px) {
     padding: 16px;
   }
 `;
+
 const Title = styled.div`
   font-weight: 600;
   font-size: 16px;
@@ -29,25 +29,72 @@ const Title = styled.div`
   }
 `;
 
-const AddWorkout = ({ workout, setWorkout, addNewWorkout, buttonLoading }) => {
+const Dropdown = styled.select`
+  width: 100%;
+  padding: 12px;
+  border: 1px solid ${({ theme }) => theme.text_secondary + 50};
+  border-radius: 8px;
+  background: ${({ theme }) => theme.bg};
+  color: ${({ theme }) => theme.text_primary};
+  font-size: 14px;
+  outline: none;
+  &:focus {
+    border-color: ${({ theme }) => theme.primary};
+  }
+`;
+
+const Row = styled.div`
+  display: flex;
+  gap: 12px;
+  @media (max-width: 600px) {
+    flex-direction: column;
+  }
+`;
+
+const AddWorkout = ({ addNewWorkout, buttonLoading }) => {
+  const navigate = useNavigate();
   const [feedback, setFeedback] = useState("");
 
-  const token =
-    useSelector((s) => s.user?.token || s.user?.currentUser?.token) ||
-    localStorage.getItem("token");
+  // Form fields
+  const [category, setCategory] = useState("Cardio");
+  const [workoutName, setWorkoutName] = useState("");
+  const [sets, setSets] = useState("");
+  const [reps, setReps] = useState("");
+  const [weight, setWeight] = useState("");
+  const [duration, setDuration] = useState("");
 
-  const navigate = useNavigate();
+  const categories = [
+    "Cardio",
+    "Chest",
+    "Back",
+    "Legs",
+    "Arms",
+    "Shoulders",
+    "Abs",
+    "Core",
+    "HIIT",
+    "Flexibility",
+    "Other",
+  ];
 
   const handleAddWorkout = async () => {
-    if (!(workout || "").trim()) {
-      setFeedback("Please enter workout details.");
+    if (!workoutName.trim()) {
+      setFeedback("Please enter workout name.");
       setTimeout(() => setFeedback(""), 2000);
       return;
     }
 
+    // Build the workout string in the expected format
+    const workoutString = `#${category}
+-${workoutName}
+-Sets: ${sets || 0}
+-Reps: ${reps || 0}
+-Weight: ${weight || 0}
+-Duration: ${duration || 0}`;
+
     const payload = {
-      category: "general",
-      workout,
+      category,
+      workout: workoutString,
       date: new Date().toISOString(),
     };
 
@@ -57,15 +104,19 @@ const AddWorkout = ({ workout, setWorkout, addNewWorkout, buttonLoading }) => {
     try {
       const res = await apiAddWorkout(payload);
       setFeedback("Workout added successfully!");
-      setWorkout(""); // clear input
 
-      // 👇 THIS IS KEY - call parent callback to refresh data
+      // Clear form
+      setWorkoutName("");
+      setSets("");
+      setReps("");
+      setWeight("");
+      setDuration("");
+
       if (typeof addNewWorkout === "function") {
-        await addNewWorkout(); // 👈 Make sure to await it
+        await addNewWorkout();
       }
     } catch (err) {
       console.error("Add workout error:", err?.response?.data || err);
-      console.error("Full error response:", err?.response);
 
       if (err.response?.status === 401) {
         setFeedback("Session expired. Please sign in again.");
@@ -82,21 +133,66 @@ const AddWorkout = ({ workout, setWorkout, addNewWorkout, buttonLoading }) => {
   return (
     <Card>
       <Title>Add New Workout</Title>
-      <TextInput
-        label="Workout"
-        textArea
-        rows={10}
-        placeholder={`Enter in this format:
 
-#Category
--Workout Name
--Sets
--Reps
--Weight
--Duration`}
-        value={workout}
-        handelChange={(e) => setWorkout(e.target.value)}
+      <div>
+        <label
+          style={{
+            fontSize: 14,
+            marginBottom: 4,
+            display: "block",
+          }}
+        >
+          Category
+        </label>
+        <Dropdown
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          {categories.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </Dropdown>
+      </div>
+
+      <TextInput
+        label="Workout Name"
+        placeholder="e.g., Bench Press, Running, Squats"
+        value={workoutName}
+        handleChange={(e) => setWorkoutName(e.target.value)}
       />
+
+      <Row>
+        <TextInput
+          label="Sets"
+          placeholder="3"
+          value={sets}
+          handleChange={(e) => setSets(e.target.value)}
+        />
+        <TextInput
+          label="Reps"
+          placeholder="10"
+          value={reps}
+          handleChange={(e) => setReps(e.target.value)}
+        />
+      </Row>
+
+      <Row>
+        <TextInput
+          label="Weight (lbs)"
+          placeholder="135"
+          value={weight}
+          handleChange={(e) => setWeight(e.target.value)}
+        />
+        <TextInput
+          label="Duration (min)"
+          placeholder="30"
+          value={duration}
+          handleChange={(e) => setDuration(e.target.value)}
+        />
+      </Row>
+
       <Button
         text="Add Workout"
         small
@@ -104,7 +200,18 @@ const AddWorkout = ({ workout, setWorkout, addNewWorkout, buttonLoading }) => {
         isLoading={buttonLoading}
         isDisabled={buttonLoading}
       />
-      {feedback && <div style={{ marginTop: 8, fontSize: 14 }}>{feedback}</div>}
+
+      {feedback && (
+        <div
+          style={{
+            marginTop: 8,
+            fontSize: 14,
+            textAlign: "center",
+          }}
+        >
+          {feedback}
+        </div>
+      )}
     </Card>
   );
 };

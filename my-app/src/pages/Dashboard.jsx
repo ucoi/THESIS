@@ -67,7 +67,6 @@ const Dashboard = () => {
   const [data, setData] = useState();
   const [buttonLoading, setButtonLoading] = useState(false);
   const [todaysWorkouts, setTodaysWorkouts] = useState([]);
-  const [workout, setWorkout] = useState("");
 
   const dashboardData = async () => {
     setLoading(true);
@@ -122,8 +121,6 @@ const Dashboard = () => {
           <WeeklyStatCard data={data} />
           <CategoryChart data={data} />
           <AddWorkout
-            workout={workout}
-            setWorkout={setWorkout}
             addNewWorkout={addNewWorkout}
             buttonLoading={buttonLoading}
           />
