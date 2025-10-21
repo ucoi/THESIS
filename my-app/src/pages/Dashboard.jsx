@@ -72,7 +72,7 @@ const Dashboard = () => {
     setLoading(true);
     try {
       const res = await getDashboardDetails();
-      console.log("Dashboard data refreshed:", res.data); // 👈 ADD THIS
+      console.log("Dashboard data refreshed:", res.data);
       setData(res.data);
     } catch (err) {
       console.error("Dashboard error:", err);
@@ -86,7 +86,7 @@ const Dashboard = () => {
     setLoading(true);
     try {
       const res = await getWorkouts("");
-      console.log("Today's workouts refreshed:", res?.data?.todaysWorkouts); // 👈 ADD THIS
+      console.log("Today's workouts refreshed:", res?.data?.todaysWorkouts);
       setTodaysWorkouts(res?.data?.todaysWorkouts || []);
     } catch (err) {
       console.error("Get workouts error:", err);
@@ -96,8 +96,12 @@ const Dashboard = () => {
   };
 
   const addNewWorkout = async () => {
-    console.log("addNewWorkout callback triggered"); // 👈 ADD THIS
-    // Refresh both dashboard data and today's workouts
+    console.log("addNewWorkout callback triggered");
+    await dashboardData();
+    await getTodaysWorkout();
+  };
+
+  const handleDeleteWorkout = async () => {
     await dashboardData();
     await getTodaysWorkout();
   };
@@ -130,7 +134,11 @@ const Dashboard = () => {
           <Title>Todays Workouts</Title>
           <CardWrapper>
             {todaysWorkouts.map((workout) => (
-              <WorkoutCard key={workout._id} workout={workout} />
+              <WorkoutCard
+                key={workout._id}
+                workout={workout}
+                onDelete={handleDeleteWorkout}
+              />
             ))}
           </CardWrapper>
         </Section>

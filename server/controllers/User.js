@@ -355,3 +355,35 @@ const calculateCaloriesBurnt = (workoutDetails) => {
   const MET = 8; // average for moderate workouts
   return ((durationInMinutes * MET * weightInKg) / 200).toFixed(1);
 };
+
+/* ------------------------------ DELETE WORKOUTS ------------------------------ */
+export const deleteWorkout = async (req, res, next) => {
+  try {
+    const userId = req.user?.id || req.userId;
+    const { workoutId } = req.params;
+
+    if (!userId) return next(createError(401, "Unauthorized"));
+    if (!workoutId) return next(createError(400, "Workout ID required"));
+
+    // Find the workout and verify it belongs to the user
+    const workout = await Workout.findById(workoutId);
+
+    if (!workout) {
+      return next(createError(404, "Workout not found"));
+    }
+
+    if (workout.user.toString() !== userId) {
+      return next(createError(403, "You can only delete your own workouts"));
+    }
+
+    await Workout.findByIdAndDelete(workoutId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Workout deleted successfully",
+    });
+  } catch (err) {
+    console.error("[deleteWorkout] error:", err);
+    next(err);
+  }
+};

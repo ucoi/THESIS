@@ -19,5 +19,7 @@ export const getDashboardDetails = async () => await API.get("/user/dashboard");
 export const getWorkouts = async (date) =>
   await API.get(`/user/workout${date ? `?date=${date}` : ""}`);
 export const addWorkout = async (data) => await API.post("/user/workout", data);
+export const deleteWorkout = async (workoutId) =>
+  await API.delete(`/user/workout/${workoutId}`);
 
 export default API;
