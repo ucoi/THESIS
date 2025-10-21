@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import WorkoutCard from "../components/cards/WorkoutCard";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { CalendarPicker } from "@mui/x-date-pickers/CalendarPicker";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { CalendarPicker } from "@mui/x-date-pickers"; // 👈 CHANGE THIS
+import { getWorkouts } from "../api";
+import { CircularProgress } from "@mui/material";
 
 const Container = styled.div`
   flex: 1;
@@ -13,7 +15,6 @@ const Container = styled.div`
   padding: 22px 0px;
   overflow-y: scroll;
 `;
-
 const Wrapper = styled.div`
   flex: 1;
   max-width: 1600px;
@@ -25,16 +26,14 @@ const Wrapper = styled.div`
     flex-direction: column;
   }
 `;
-
 const Left = styled.div`
   flex: 0.2;
   height: fit-content;
   padding: 18px;
-  border: 1px solid ${({ theme }) => theme.text_primary + "20"};
+  border: 1px solid ${({ theme }) => theme.text_primary + 20};
   border-radius: 14px;
-  box-shadow: 1px 6px 20px 0px ${({ theme }) => theme.primary + "15"};
+  box-shadow: 1px 6px 20px 0px ${({ theme }) => theme.primary + 15};
 `;
-
 const Title = styled.div`
   font-weight: 600;
   font-size: 16px;
@@ -43,11 +42,9 @@ const Title = styled.div`
     font-size: 14px;
   }
 `;
-
 const Right = styled.div`
   flex: 1;
 `;
-
 const CardWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -58,7 +55,6 @@ const CardWrapper = styled.div`
     gap: 12px;
   }
 `;
-
 const Section = styled.div`
   display: flex;
   flex-direction: column;
@@ -68,7 +64,6 @@ const Section = styled.div`
     gap: 12px;
   }
 `;
-
 const SecTitle = styled.div`
   font-size: 22px;
   color: ${({ theme }) => theme.text_primary};
@@ -76,33 +71,64 @@ const SecTitle = styled.div`
 `;
 
 const Workouts = () => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [todaysWorkouts, setTodaysWorkouts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [date, setDate] = useState("");
+
+  const getWorkoutsForDate = async () => {
+    setLoading(true);
+    try {
+      const res = await getWorkouts(date ? `?date=${date}` : "");
+      setTodaysWorkouts(res?.data?.todaysWorkouts || []);
+      console.log(res.data);
+    } catch (err) {
+      console.error("Get workouts error:", err);
+      alert(err?.response?.data?.message || "Failed to load workouts");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteWorkout = async () => {
+    await getWorkoutsForDate();
+  };
+
+  useEffect(() => {
+    getWorkoutsForDate();
+  }, [date]);
 
   return (
     <Container>
       <Wrapper>
         <Left>
           <Title>Select Date</Title>
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
             <CalendarPicker
-              date={selectedDate}
-              onChange={(newDate) => setSelectedDate(newDate)}
+              date={null}
+              onChange={(newDate) => {
+                if (newDate) {
+                  setDate(`${newDate.$M + 1}/${newDate.$D}/${newDate.$y}`);
+                }
+              }}
             />
           </LocalizationProvider>
         </Left>
         <Right>
           <Section>
             <SecTitle>Todays Workout</SecTitle>
-            <CardWrapper>
-              <WorkoutCard />
-              <WorkoutCard />
-              <WorkoutCard />
-              <WorkoutCard />
-              <WorkoutCard />
-              <WorkoutCard />
-              <WorkoutCard />
-              <WorkoutCard />
-            </CardWrapper>
+            {loading ? (
+              <CircularProgress />
+            ) : (
+              <CardWrapper>
+                {todaysWorkouts.map((workout) => (
+                  <WorkoutCard
+                    key={workout._id}
+                    workout={workout}
+                    onDelete={handleDeleteWorkout}
+                  />
+                ))}
+              </CardWrapper>
+            )}
           </Section>
         </Right>
       </Wrapper>
