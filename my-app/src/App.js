@@ -3,7 +3,6 @@ import { lightTheme } from "./utils/Themes";
 import { BrowserRouter } from "react-router-dom";
 import Authentication from "./pages/Authentication";
 import Navbar from "./components/Navbar";
-import { useState } from "react";
 import Dashboard from "./pages/Dashboard";
 import Workouts from "./pages/Workouts";
 import { Routes, Route } from "react-router-dom";
