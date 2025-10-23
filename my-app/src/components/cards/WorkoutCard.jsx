@@ -6,39 +6,50 @@ import {
   DeleteRounded,
 } from "@mui/icons-material";
 import { deleteWorkout } from "../../api";
-import { CircularProgress, IconButton } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 
 const Card = styled.div`
   flex: 1;
   min-width: 250px;
   max-width: 400px;
-  padding: 16px 18px;
-  border: 1px solid ${({ theme }) => theme.text_primary + 20};
-  border-radius: 14px;
-  box-shadow: 1px 6px 20px 0px ${({ theme }) => theme.primary + 15};
+  padding: 20px;
+  border: 1px solid ${({ theme }) => theme.text_primary + 15};
+  border-radius: 16px;
+  box-shadow: ${({ theme }) => theme.shadow};
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 12px;
   position: relative;
+  background: ${({ theme }) => theme.card};
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: ${({ theme }) => theme.shadow_lg};
+  }
+
   @media (max-width: 600px) {
-    padding: 12px 14px;
+    padding: 16px;
   }
 `;
 
 const Category = styled.div`
   width: fit-content;
-  font-size: 14px;
+  font-size: 13px;
   color: ${({ theme }) => theme.primary};
-  font-weight: 500;
+  font-weight: 600;
   background: ${({ theme }) => theme.primary + 20};
-  padding: 4px 8px;
-  border-radius: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 `;
 
 const Name = styled.div`
   font-size: 20px;
   color: ${({ theme }) => theme.text_primary};
-  font-weight: 600;
+  font-weight: 700;
+  margin-top: 4px;
 `;
 
 const Sets = styled.div`
@@ -51,26 +62,55 @@ const Sets = styled.div`
 
 const Flex = styled.div`
   display: flex;
-  gap: 16px;
+  gap: 20px;
+  margin-top: 8px;
 `;
 
 const Details = styled.div`
   font-size: 15px;
   color: ${({ theme }) => theme.text_primary};
-  font-weight: 500;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  background: ${({ theme }) => theme.card_light};
+  padding: 8px 12px;
+  border-radius: 8px;
 `;
 
-const DeleteButton = styled(IconButton)`
+const DeleteButton = styled.button`
   position: absolute;
-  top: 8px;
-  right: 8px;
-  color: ${({ theme }) => theme.text_secondary};
+  top: 16px;
+  right: 16px;
+  background: ${({ theme }) => theme.red + 20};
+  color: ${({ theme }) => theme.red};
+  border: none;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  opacity: 0;
+
+  ${Card}:hover & {
+    opacity: 1;
+  }
+
   &:hover {
-    color: ${({ theme }) => theme.red};
-    background: ${({ theme }) => theme.red + 20};
+    background: ${({ theme }) => theme.red};
+    color: ${({ theme }) => theme.white};
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
   }
 `;
 
@@ -100,14 +140,18 @@ const WorkoutCard = ({ workout, onDelete }) => {
 
   return (
     <Card>
-      <DeleteButton onClick={handleDelete} disabled={deleting} size="small">
-        {deleting ? <CircularProgress size={20} /> : <DeleteRounded />}
+      <DeleteButton onClick={handleDelete} disabled={deleting}>
+        {deleting ? (
+          <CircularProgress size={20} style={{ color: "inherit" }} />
+        ) : (
+          <DeleteRounded fontSize="small" />
+        )}
       </DeleteButton>
 
       <Category>#{workout?.category}</Category>
       <Name>{workout?.workoutName}</Name>
       <Sets>
-        {workout?.sets} sets X {workout?.reps} reps
+        {workout?.sets} sets × {workout?.reps} reps
       </Sets>
       <Flex>
         <Details>

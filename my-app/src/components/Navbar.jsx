@@ -24,13 +24,22 @@ const Nav = styled.nav`
 `;
 const NavContainer = styled.div`
   width: 100%;
-  max-width: 1400px;
-  padding: 0 32px; /* Increased padding */
+  height: 70px;
+  background: ${({ theme }) => theme.card};
   display: flex;
-  gap: 24px; /* Increased gap */
   align-items: center;
   justify-content: space-between;
-  font-size: 1rem;
+  padding: 0 32px;
+  box-shadow: ${({ theme }) => theme.shadow};
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+  background: ${({ theme }) => theme.card}f0;
+
+  @media (max-width: 768px) {
+    padding: 0 16px;
+  }
 `;
 const NavLogo = styled(LinkR)`
   display: flex;
@@ -69,18 +78,23 @@ const NavItems = styled.ul`
 const Navlink = styled(NavLink)`
   display: flex;
   align-items: center;
-  color: ${({ theme }) => theme.text_primary};
-  font-weight: 500;
+  color: ${({ theme }) => theme.text_secondary};
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  position: relative;
+
   &:hover {
-    color: ${({ theme }) => theme.accent || "#007BFF"}; /* Accent color */
-    transform: scale(1.1); /* Slight zoom effect */
+    color: ${({ theme }) => theme.primary};
+    background: ${({ theme }) => theme.primary + 10};
   }
+
   &.active {
-    color: ${({ theme }) => theme.accent || "#007BFF"};
-    border-bottom: 2px solid ${({ theme }) => theme.accent || "#007BFF"};
+    color: ${({ theme }) => theme.primary};
+    background: ${({ theme }) => theme.primary + 20};
   }
 `;
 const UserContainer = styled.div`
@@ -95,25 +109,31 @@ const UserContainer = styled.div`
   color: ${({ theme }) => theme.primary};
 `;
 const TextButton = styled.button`
-  background: ${({ theme }) => theme.accent || "#007BFF"}; /* Accent color */
-  color: white;
+  padding: 10px 20px;
+  background: linear-gradient(
+    135deg,
+    ${({ theme }) => theme.primary} 0%,
+    ${({ theme }) => theme.secondary} 100%
+  );
+  color: ${({ theme }) => theme.white};
   border: none;
-  border-radius: 4px; /* Rounded corners */
-  padding: 8px 16px; /* Add padding */
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
-  font-size: 16px;
-  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   transition: all 0.3s ease;
+  box-shadow: ${({ theme }) => theme.shadow};
 
   &:hover {
-    background: ${({ theme }) =>
-      theme.accentHover || "#0056b3"}; /* Darker hover color */
-    transform: scale(1.05); /* Slight zoom effect */
+    transform: translateY(-2px);
+    box-shadow: ${({ theme }) => theme.shadow_lg};
   }
 
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 4px ${({ theme }) => theme.accent || "#007BFF"}; /* Focus effect */
+  &:active {
+    transform: translateY(0);
   }
 `;
 

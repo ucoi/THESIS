@@ -4,42 +4,63 @@ import TextInput from "./TextInput";
 import Button from "./Button";
 import { addWorkout as apiAddWorkout } from "../api";
 import { useNavigate } from "react-router-dom";
+import { AddRounded } from "@mui/icons-material";
 
 const Card = styled.div`
   flex: 1;
   min-width: 280px;
-  padding: 24px;
-  border: 1px solid ${({ theme }) => theme.text_primary + 20};
-  border-radius: 14px;
-  box-shadow: 1px 6px 20px 0px ${({ theme }) => theme.primary + 15};
+  padding: 28px;
+  border: 1px solid ${({ theme }) => theme.text_primary + 15};
+  border-radius: 16px;
+  box-shadow: ${({ theme }) => theme.shadow};
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+  background: ${({ theme }) => theme.card};
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: ${({ theme }) => theme.shadow_lg};
+  }
+
   @media (max-width: 600px) {
-    padding: 16px;
+    padding: 20px;
   }
 `;
 
 const Title = styled.div`
-  font-weight: 600;
-  font-size: 16px;
-  color: ${({ theme }) => theme.primary};
+  font-weight: 700;
+  font-size: 20px;
+  color: ${({ theme }) => theme.text_primary};
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
   @media (max-width: 600px) {
-    font-size: 14px;
+    font-size: 18px;
   }
 `;
 
 const Dropdown = styled.select`
   width: 100%;
-  padding: 12px;
-  border: 1px solid ${({ theme }) => theme.text_secondary + 50};
-  border-radius: 8px;
-  background: ${({ theme }) => theme.bg};
+  padding: 14px;
+  border: 2px solid ${({ theme }) => theme.text_secondary + 30};
+  border-radius: 10px;
+  background: ${({ theme }) => theme.card_light};
   color: ${({ theme }) => theme.text_primary};
   font-size: 14px;
+  font-weight: 500;
   outline: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
   &:focus {
     border-color: ${({ theme }) => theme.primary};
+    background: ${({ theme }) => theme.card};
+  }
+
+  &:hover {
+    border-color: ${({ theme }) => theme.primary + 50};
   }
 `;
 
@@ -51,11 +72,43 @@ const Row = styled.div`
   }
 `;
 
+const Label = styled.label`
+  font-size: 13px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.text_secondary};
+  margin-bottom: 6px;
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
+const Message = styled.div`
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  background: ${({ success, theme }) =>
+    success ? theme.green + 20 : theme.red + 20};
+  color: ${({ success, theme }) => (success ? theme.green : theme.red)};
+  font-size: 14px;
+  font-weight: 500;
+  animation: slideIn 0.3s ease;
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
 const AddWorkout = ({ addNewWorkout, buttonLoading }) => {
   const navigate = useNavigate();
-  const [feedback, setFeedback] = useState("");
+  const [feedback, setFeedback] = useState({ message: "", success: false });
 
-  // Form fields
   const [category, setCategory] = useState("Cardio");
   const [workoutName, setWorkoutName] = useState("");
   const [sets, setSets] = useState("");
@@ -79,12 +132,11 @@ const AddWorkout = ({ addNewWorkout, buttonLoading }) => {
 
   const handleAddWorkout = async () => {
     if (!workoutName.trim()) {
-      setFeedback("Please enter workout name.");
-      setTimeout(() => setFeedback(""), 2000);
+      setFeedback({ message: "Please enter workout name.", success: false });
+      setTimeout(() => setFeedback({ message: "", success: false }), 2000);
       return;
     }
 
-    // Build the workout string in the expected format
     const workoutString = `#${category}
 -${workoutName}
 -Sets: ${sets || 0}
@@ -98,14 +150,10 @@ const AddWorkout = ({ addNewWorkout, buttonLoading }) => {
       date: new Date().toISOString(),
     };
 
-    console.log("Sending payload:", payload);
-
-    setFeedback("");
     try {
       const res = await apiAddWorkout(payload);
-      setFeedback("Workout added successfully!");
+      setFeedback({ message: "Workout added successfully! 💪", success: true });
 
-      // Clear form
       setWorkoutName("");
       setSets("");
       setReps("");
@@ -119,31 +167,28 @@ const AddWorkout = ({ addNewWorkout, buttonLoading }) => {
       console.error("Add workout error:", err?.response?.data || err);
 
       if (err.response?.status === 401) {
-        setFeedback("Session expired. Please sign in again.");
+        setFeedback({
+          message: "Session expired. Please sign in again.",
+          success: false,
+        });
         setTimeout(() => navigate("/signin"), 2000);
       } else {
         const msg = err?.response?.data?.message || "Failed to add workout.";
-        setFeedback(msg);
+        setFeedback({ message: msg, success: false });
       }
     } finally {
-      setTimeout(() => setFeedback(""), 3000);
+      setTimeout(() => setFeedback({ message: "", success: false }), 3000);
     }
   };
 
   return (
     <Card>
-      <Title>Add New Workout</Title>
+      <Title>
+        <AddRounded /> Add New Workout
+      </Title>
 
       <div>
-        <label
-          style={{
-            fontSize: 14,
-            marginBottom: 4,
-            display: "block",
-          }}
-        >
-          Category
-        </label>
+        <Label>Category</Label>
         <Dropdown
           value={category}
           onChange={(e) => setCategory(e.target.value)}
@@ -158,7 +203,7 @@ const AddWorkout = ({ addNewWorkout, buttonLoading }) => {
 
       <TextInput
         label="Workout Name"
-        placeholder="e.g., Bench Press, Running, Squats"
+        placeholder="e.g., Bench Press, Running"
         value={workoutName}
         handleChange={(e) => setWorkoutName(e.target.value)}
       />
@@ -180,8 +225,8 @@ const AddWorkout = ({ addNewWorkout, buttonLoading }) => {
 
       <Row>
         <TextInput
-          label="Weight (lbs)"
-          placeholder="135"
+          label="Weight (kg)"
+          placeholder="50"
           value={weight}
           handleChange={(e) => setWeight(e.target.value)}
         />
@@ -195,22 +240,14 @@ const AddWorkout = ({ addNewWorkout, buttonLoading }) => {
 
       <Button
         text="Add Workout"
-        small
+        leftIcon={<AddRounded />}
         onClick={handleAddWorkout}
         isLoading={buttonLoading}
         isDisabled={buttonLoading}
       />
 
-      {feedback && (
-        <div
-          style={{
-            marginTop: 8,
-            fontSize: 14,
-            textAlign: "center",
-          }}
-        >
-          {feedback}
-        </div>
+      {feedback.message && (
+        <Message success={feedback.success}>{feedback.message}</Message>
       )}
     </Card>
   );

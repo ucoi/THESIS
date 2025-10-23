@@ -1,6 +1,6 @@
-import { CloseRounded, Visibility, VisibilityOff } from "@mui/icons-material";
 import React, { useState } from "react";
 import styled from "styled-components";
+import { Visibility, VisibilityOff, CloseRounded } from "@mui/icons-material";
 
 const Container = styled.div`
   flex: 1;
@@ -10,121 +10,102 @@ const Container = styled.div`
 `;
 
 const Label = styled.label`
-  font-size: 12px;
-  color: ${({ theme }) => theme.text_primary};
-  padding: 0px 4px;
-  ${({ error, theme }) =>
-    error &&
-    `
-    color: ${theme.red};
-  `}
-  ${({ small }) =>
-    small &&
-    `
-    font-size: 8px;
-  `}
-  ${({ popup, theme }) =>
-    popup &&
-    `
-  color: ${theme.popup_text_secondary};
-  `}
+  font-size: 13px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.text_secondary};
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 `;
 
 const OutlinedInput = styled.div`
-  border-radius: 8px;
-  border: 0.5px solid ${({ theme }) => theme.text_secondary};
-  background-color: transparent;
+  width: 100%;
+  border-radius: 10px;
+  border: 2px solid
+    ${({ theme, error }) => (error ? theme.red : theme.text_secondary + 30)};
+  background-color: ${({ theme }) => theme.card_light};
   color: ${({ theme }) => theme.text_primary};
   outline: none;
-  padding: 16px;
+  padding: 14px;
   display: flex;
   align-items: center;
   gap: 12px;
+  transition: all 0.3s ease;
+
   &:focus-within {
-    border-color: ${({ theme }) => theme.secondary};
+    border-color: ${({ theme, error }) => (error ? theme.red : theme.primary)};
+    background: ${({ theme }) => theme.card};
   }
-  ${({ error, theme }) =>
-    error &&
-    `
-    border-color: ${theme.red};
-  `}
 
-  ${({ chipableInput, height, theme }) =>
-    chipableInput &&
-    `
-    background: ${theme.card};
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    min-height: ${height}
-  `}
-
-  ${({ small }) =>
-    small &&
-    `
-    border-radius: 6px;
-    padding: 8px 10px;
-  `}
-
-  ${({ popup, theme }) =>
-    popup &&
-    `
-  color: ${theme.popup_text_secondary};
-  border: 0.5px solid ${theme.popup_text_secondary + 60};
-  `}
+  &:hover {
+    border-color: ${({ theme, error }) =>
+      error ? theme.red : theme.primary + 50};
+  }
 `;
 
 const Input = styled.input`
   width: 100%;
   font-size: 14px;
-  outline: none;
+  font-weight: 500;
   border: none;
-  background-color: transparent;
   color: ${({ theme }) => theme.text_primary};
-  &:focus {
-    outline: none;
-  }
-  ${({ small }) =>
-    small &&
-    `
-    font-size: 12px;
-  `}
+  background-color: transparent;
+  outline: none;
 
-  ${({ popup, theme }) =>
-    popup &&
-    `
-  color: ${theme.popup_text_secondary};
-  `} ${({ theme }) => theme.popup_text_secondary};
+  &::placeholder {
+    color: ${({ theme }) => theme.text_secondary + 80};
+  }
 `;
 
-const Error = styled.p`
+const Textarea = styled.textarea`
+  width: 100%;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  color: ${({ theme }) => theme.text_primary};
+  background-color: transparent;
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+
+  &::placeholder {
+    color: ${({ theme }) => theme.text_secondary + 80};
+  }
+`;
+
+const Error = styled.div`
   font-size: 12px;
-  margin: 0px 4px;
   color: ${({ theme }) => theme.red};
-  ${({ small }) =>
-    small &&
-    `
-    font-size: 8px;
-  `}
+  font-weight: 500;
+  margin-top: 2px;
 `;
 
 const ChipWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
+  width: 100%;
 `;
 
 const Chip = styled.div`
-  padding: 5px 10px;
-  border-radius: 8px;
-  background: ${({ theme }) => theme.primary + 10};
+  background: ${({ theme }) => theme.primary + 20};
   color: ${({ theme }) => theme.primary};
-  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  gap: 6px;
+
+  svg {
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: ${({ theme }) => theme.red};
+    }
+  }
 `;
 
 const TextInput = ({
@@ -138,38 +119,24 @@ const TextInput = ({
   onChange,
   textArea,
   rows,
-  columns,
   chipableInput,
   chipableArray = [],
   removeChip,
-  height,
-  small,
-  popup,
   password,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const changeHandler = handleChange || handelChange || onChange || (() => {});
+
   return (
-    <Container small={small}>
-      <Label small={small} popup={popup} error={error}>
-        {label}
-      </Label>
-      <OutlinedInput
-        small={small}
-        popup={popup}
-        error={error}
-        chipableInput={chipableInput}
-        height={height}
-      >
+    <Container>
+      {label && <Label>{label}</Label>}
+      <OutlinedInput error={error}>
         {chipableInput ? (
           <ChipWrapper>
             {chipableArray.map((chip, index) => (
               <Chip key={index}>
                 <span>{chip}</span>
-                <CloseRounded
-                  sx={{ fontSize: "14px" }}
-                  onClick={() => removeChip(name, index)}
-                />
+                <CloseRounded onClick={() => removeChip(name, index)} />
               </Chip>
             ))}
             <Input
@@ -181,35 +148,42 @@ const TextInput = ({
           </ChipWrapper>
         ) : (
           <>
-            <Input
-              popup={popup}
-              small={small}
-              as={textArea ? "textarea" : "input"}
-              name={name}
-              rows={rows}
-              columns={columns}
-              placeholder={placeholder}
-              value={value}
-              onChange={(e) => changeHandler(e)}
-              type={password && !showPassword ? "password" : "text"}
-            />
+            {textArea ? (
+              <Textarea
+                name={name}
+                rows={rows || 4}
+                placeholder={placeholder}
+                value={value}
+                onChange={(e) => changeHandler(e)}
+              />
+            ) : (
+              <Input
+                name={name}
+                placeholder={placeholder}
+                value={value}
+                onChange={(e) => changeHandler(e)}
+                type={password && !showPassword ? "password" : "text"}
+              />
+            )}
             {password && (
               <>
                 {showPassword ? (
-                  <Visibility onClick={() => setShowPassword(false)} />
+                  <Visibility
+                    onClick={() => setShowPassword(false)}
+                    style={{ cursor: "pointer" }}
+                  />
                 ) : (
-                  <VisibilityOff onClick={() => setShowPassword(true)} />
+                  <VisibilityOff
+                    onClick={() => setShowPassword(true)}
+                    style={{ cursor: "pointer" }}
+                  />
                 )}
               </>
             )}
           </>
         )}
       </OutlinedInput>
-      {error && (
-        <Error small={small} popup={popup}>
-          {error}
-        </Error>
-      )}
+      {error && <Error>{error}</Error>}
     </Container>
   );
 };

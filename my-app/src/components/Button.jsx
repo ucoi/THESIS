@@ -1,107 +1,79 @@
-import { CircularProgress } from "@mui/material";
 import React from "react";
 import styled from "styled-components";
+import { CircularProgress } from "@mui/material";
 
-const Button = styled.div`
-  border-radius: 10px;
-  color: white;
-  font-size: 14px;
+const StyledButton = styled.button`
+  border-radius: 12px;
+  color: ${({ theme }) => theme.white};
+  font-size: ${({ small }) => (small ? "14px" : "16px")};
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  height: min-content;
-  padding: 16px 26px;
-  box-shadow: 1px 20px 35px 0px ${({ theme }) => theme.primary + 40};
-  border: 1px solid ${({ theme }) => theme.primary};
-  @media (max-width: 600px) {
-    padding: 8px 12px;
+  gap: 8px;
+  padding: ${({ small }) => (small ? "10px 20px" : "14px 28px")};
+  border: none;
+  background: ${({ theme, outlined }) =>
+    outlined
+      ? "transparent"
+      : `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 100%)`};
+  box-shadow: ${({ theme, outlined }) => (outlined ? "none" : theme.shadow)};
+  border: ${({ theme, outlined }) =>
+    outlined ? `2px solid ${theme.primary}` : "none"};
+  color: ${({ theme, outlined }) => (outlined ? theme.primary : theme.white)};
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: ${({ theme }) => theme.shadow_lg};
+    background: ${({ theme, outlined }) =>
+      outlined
+        ? theme.primary + "10"
+        : `linear-gradient(135deg, ${theme.button_hover} 0%, ${theme.primary} 100%)`};
   }
 
-  ${({ type, theme }) =>
-    type === "secondary"
-      ? `
-  background: ${theme.secondary};
-border: 1px solid ${({ theme }) => theme.secondary};
-  `
-      : `
-  background: ${theme.primary};
-`}
+  &:active {
+    transform: translateY(0px);
+  }
 
-  ${({ isDisabled }) =>
-    isDisabled &&
-    `
-  opacity: 0.8;
-  cursor: not-allowed;
-
-  `}
-  ${({ isLoading }) =>
-    isLoading &&
-    `
-    opacity: 0.8;
-  cursor: not-allowed;
-`}
-${({ flex }) =>
-    flex &&
-    `
-    flex: 1;
-`}
-
-${({ small }) =>
-    small &&
-    `
-padding: 10px 28px;
-`}
-  ${({ outlined, theme }) =>
-    outlined &&
-    `
-background: transparent;
-color: ${theme.primary};
-  box-shadow: none;
-`}
-  ${({ full }) =>
-    full &&
-    `
-  width: 100%;`}
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
 `;
 
-const button = ({
+const Button = ({
   text,
   isLoading,
   isDisabled,
-  rightIcon,
   leftIcon,
-  type,
-  onClick,
-  flex,
-  small,
+  rightIcon,
   outlined,
-  full,
+  small,
+  onClick,
+  type,
 }) => {
   return (
-    <Button
-      onClick={() => !isDisabled && !isLoading && onClick()}
-      isDisabled={isDisabled}
-      type={type}
-      isLoading={isLoading}
-      flex={flex}
-      small={small}
+    <StyledButton
+      onClick={onClick}
+      disabled={isDisabled || isLoading}
       outlined={outlined}
-      full={full}
+      small={small}
+      type={type}
     >
-      {isLoading && (
-        <CircularProgress
-          style={{ width: "18px", height: "18px", color: "inherit" }}
-        />
+      {isLoading ? (
+        <CircularProgress size={small ? 18 : 22} style={{ color: "inherit" }} />
+      ) : (
+        <>
+          {leftIcon}
+          {text}
+          {rightIcon}
+        </>
       )}
-      {leftIcon}
-      {text}
-      {isLoading && <> . . .</>}
-      {rightIcon}
-    </Button>
+    </StyledButton>
   );
 };
 
-export default button;
+export default Button;

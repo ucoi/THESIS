@@ -1,37 +1,26 @@
 import {
   FitnessCenterRounded,
   LocalFireDepartmentRounded,
-  TimelineRounded,
+  TimelapseRounded,
 } from "@mui/icons-material";
 
 export const counts = [
   {
     name: "Calories Burned",
-    icon: (
-      <LocalFireDepartmentRounded sx={{ color: "inherit", fontSize: "26px" }} />
-    ),
-    desc: "Total calories burned today",
-    key: "totalCaloriesBurnt",
-    unit: "kcal",
-    color: "#eb9e34",
-    lightColor: "#FDF4EA",
+    icon: <LocalFireDepartmentRounded />,
+    value: (data) => data?.totalCaloriesBurnt || 0, // 👈 Changed to function
   },
   {
     name: "Workouts",
-    icon: <FitnessCenterRounded sx={{ color: "inherit", fontSize: "26px" }} />,
-    desc: "Total no of workouts for today",
-    key: "totalWorkouts",
-    unit: "",
-    color: "#41C1A6",
-    lightColor: "#E8F6F3",
+    icon: <FitnessCenterRounded />,
+    value: (data) => data?.totalWorkouts || 0, // 👈 Changed to function
   },
   {
-    name: "Average  Calories Burned",
-    icon: <TimelineRounded sx={{ color: "inherit", fontSize: "26px" }} />,
-    desc: "Average Calories Burned on each workout",
-    key: "avgCaloriesBurntPerWorkout",
-    unit: "kcal",
-    color: "#FF9AD5",
-    lightColor: "#FEF3F9",
+    name: "Average Duration",
+    icon: <TimelapseRounded />,
+    value: (data) => {
+      const avgMinutes = data?.avgCaloriesBurntPerWorkout || 0;
+      return `${avgMinutes.toFixed(0)} min`;
+    }, // 👈 Changed to function
   },
 ];
