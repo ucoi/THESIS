@@ -6,8 +6,11 @@ import WeeklyStatCard from "../components/cards/WeeklystatCard";
 import CategoryChart from "../components/cards/CategoryChart";
 import AddWorkout from "../components/AddWorkout";
 import WorkoutCard from "../components/cards/WorkoutCard";
+import StreakCard from "../components/cards/StreakCard";
+import QuoteCard from "../components/cards/QuoteCard";
+import WeeklyGoalCard from "../components/cards/WeeklyGoalCard";
 import { getDashboardDetails, getWorkouts } from "../api";
-import { useSelector } from "react-redux"; // 👈 ADD THIS
+import { useSelector } from "react-redux";
 
 const Container = styled.div`
   flex: 1;
@@ -17,6 +20,7 @@ const Container = styled.div`
   padding: 22px 0px;
   overflow-y: scroll;
 `;
+
 const Wrapper = styled.div`
   flex: 1;
   max-width: 1400px;
@@ -27,11 +31,12 @@ const Wrapper = styled.div`
     gap: 12px;
   }
 `;
+
 const Title = styled.div`
   padding: 0px 16px;
-  font-size: 28px; // 👈 INCREASED SIZE
+  font-size: 28px;
   color: ${({ theme }) => theme.text_primary};
-  font-weight: 700; // 👈 MADE BOLDER
+  font-weight: 700;
 
   span {
     background: linear-gradient(
@@ -44,6 +49,7 @@ const Title = styled.div`
     background-clip: text;
   }
 `;
+
 const FlexWrap = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -54,6 +60,7 @@ const FlexWrap = styled.div`
     gap: 12px;
   }
 `;
+
 const Section = styled.div`
   display: flex;
   flex-direction: column;
@@ -63,11 +70,13 @@ const Section = styled.div`
     gap: 12px;
   }
 `;
+
 const SectionTitle = styled.div`
   font-size: 22px;
   color: ${({ theme }) => theme.text_primary};
   font-weight: 600;
 `;
+
 const CardWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -79,12 +88,39 @@ const CardWrapper = styled.div`
   }
 `;
 
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 60px 20px;
+  color: ${({ theme }) => theme.text_secondary};
+  background: ${({ theme }) => theme.card};
+  border-radius: 16px;
+  border: 2px dashed ${({ theme }) => theme.text_secondary}30;
+
+  h3 {
+    font-size: 24px;
+    margin-bottom: 12px;
+    color: ${({ theme }) => theme.text_primary};
+  }
+
+  p {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  .emoji {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+`;
+
 const Dashboard = () => {
-  const { currentUser } = useSelector((state) => state.user); // 👈 ADD THIS
+  const { currentUser } = useSelector((state) => state.user);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState();
   const [buttonLoading, setButtonLoading] = useState(false);
   const [todaysWorkouts, setTodaysWorkouts] = useState([]);
+  const [streak, setStreak] = useState(0);
+  const [weeklyWorkouts, setWeeklyWorkouts] = useState(0);
 
   const dashboardData = async () => {
     setLoading(true);
@@ -92,6 +128,12 @@ const Dashboard = () => {
       const res = await getDashboardDetails();
       console.log("Dashboard data refreshed:", res.data);
       setData(res.data);
+
+      // Calculate streak (you can enhance this with backend data)
+      calculateStreak(res.data);
+
+      // Calculate weekly workouts
+      setWeeklyWorkouts(res.data?.totalWorkouts || 0);
     } catch (err) {
       console.error("Dashboard error:", err);
       alert(err?.response?.data?.message || "Failed to load dashboard");
@@ -113,6 +155,19 @@ const Dashboard = () => {
     }
   };
 
+  const calculateStreak = (dashboardData) => {
+    // Simple streak calculation - you can enhance this
+    // For now, if there are workouts today, increment streak
+    const hasWorkoutToday = todaysWorkouts.length > 0;
+
+    // This is a placeholder - in production, you'd calculate this on backend
+    // based on consecutive days with workouts
+    const currentStreak = dashboardData?.totalWorkouts
+      ? Math.min(dashboardData.totalWorkouts, 100)
+      : 0;
+    setStreak(currentStreak);
+  };
+
   const addNewWorkout = async () => {
     console.log("addNewWorkout callback triggered");
     await dashboardData();
@@ -129,7 +184,6 @@ const Dashboard = () => {
     getTodaysWorkout();
   }, []);
 
-  // 👇 ADD THIS - Get first name from user
   const getFirstName = () => {
     const fullName = currentUser?.user?.name || currentUser?.name || "User";
     return fullName.split(" ")[0];
@@ -141,12 +195,22 @@ const Dashboard = () => {
         <Title>
           Hey, <span>{getFirstName()}</span> 👋
         </Title>
+
+        {/* Stats Cards Row */}
         <FlexWrap>
           {counts.map((item) => (
             <CountsCard key={item.name} item={item} data={data} />
           ))}
         </FlexWrap>
 
+        {/* Motivation & Goals Row */}
+        <FlexWrap>
+          <QuoteCard />
+          <StreakCard streak={streak} lastWorkout={todaysWorkouts[0]?.date} />
+          <WeeklyGoalCard completedWorkouts={weeklyWorkouts} />
+        </FlexWrap>
+
+        {/* Charts & Add Workout Row */}
         <FlexWrap>
           <WeeklyStatCard data={data} />
           <CategoryChart data={data} />
@@ -156,17 +220,26 @@ const Dashboard = () => {
           />
         </FlexWrap>
 
+        {/* Today's Workouts Section */}
         <Section>
           <SectionTitle>Today's Workouts</SectionTitle>
-          <CardWrapper>
-            {todaysWorkouts.map((workout) => (
-              <WorkoutCard
-                key={workout._id}
-                workout={workout}
-                onDelete={handleDeleteWorkout}
-              />
-            ))}
-          </CardWrapper>
+          {todaysWorkouts.length > 0 ? (
+            <CardWrapper>
+              {todaysWorkouts.map((workout) => (
+                <WorkoutCard
+                  key={workout._id}
+                  workout={workout}
+                  onDelete={handleDeleteWorkout}
+                />
+              ))}
+            </CardWrapper>
+          ) : (
+            <EmptyState>
+              <div className="emoji">🏋️</div>
+              <h3>No workouts yet today</h3>
+              <p>Time to get moving! Add your first workout above.</p>
+            </EmptyState>
+          )}
         </Section>
       </Wrapper>
     </Container>
