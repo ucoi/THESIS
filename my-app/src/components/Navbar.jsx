@@ -1,7 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FitnessCenterRounded, LogoutRounded } from "@mui/icons-material";
+import {
+  FitnessCenterRounded,
+  LogoutRounded,
+  MenuRounded,
+  CloseRounded,
+  DarkModeRounded,
+  LightModeRounded,
+} from "@mui/icons-material";
 import { useDispatch } from "react-redux";
 import { logout } from "../redux/reducer/userSlice";
 
@@ -16,7 +23,7 @@ const NavbarContainer = styled.div`
   box-shadow: ${({ theme }) => theme.shadow};
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 100;
   backdrop-filter: blur(10px);
   background: ${({ theme }) => theme.card}f0;
 
@@ -50,7 +57,49 @@ const NavLinks = styled.div`
   align-items: center;
   gap: 8px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
+    display: none;
+  }
+`;
+
+const MobileMenuIcon = styled.div`
+  display: none;
+  color: ${({ theme }) => theme.text_primary};
+  cursor: pointer;
+  padding: 8px;
+
+  @media (max-width: 1024px) {
+    display: flex;
+    align-items: center;
+  }
+`;
+
+const MobileMenu = styled.div`
+  position: fixed;
+  top: 70px;
+  left: 0;
+  right: 0;
+  background: ${({ theme }) => theme.card};
+  padding: 20px;
+  box-shadow: ${({ theme }) => theme.shadow_lg};
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 99;
+  animation: slideDown 0.3s ease;
+
+  @keyframes slideDown {
+    from {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @media (min-width: 1025px) {
     display: none;
   }
 `;
@@ -76,6 +125,11 @@ const StyledNavLink = styled(NavLink)`
     color: ${({ theme }) => theme.primary};
     background: ${({ theme }) => theme.primary + 20};
   }
+
+  @media (max-width: 1024px) {
+    padding: 12px 16px;
+    font-size: 16px;
+  }
 `;
 
 const NavbarRight = styled.div`
@@ -84,10 +138,34 @@ const NavbarRight = styled.div`
   gap: 16px;
 `;
 
+const ThemeToggle = styled.button`
+  background: ${({ theme }) => theme.primary}20;
+  border: none;
+  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: ${({ theme }) => theme.primary};
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: ${({ theme }) => theme.primary};
+    color: white;
+    transform: rotate(180deg);
+  }
+`;
+
 const UserContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const Avatar = styled.div`
@@ -112,7 +190,7 @@ const UserName = styled.div`
   color: ${({ theme }) => theme.text_primary};
   font-size: 14px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     display: none;
   }
 `;
@@ -144,11 +222,18 @@ const LogoutButton = styled.button`
   &:active {
     transform: translateY(0);
   }
+
+  @media (max-width: 768px) {
+    padding: 10px;
+    font-size: 0;
+    gap: 0;
+  }
 `;
 
-const Navbar = ({ currentUser }) => {
+const Navbar = ({ currentUser, isDarkMode, toggleTheme }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -165,41 +250,82 @@ const Navbar = ({ currentUser }) => {
     return name[0];
   };
 
-  return (
-    <NavbarContainer>
-      <NavbarLeft>
-        <Logo onClick={() => navigate("/")}>
-          <FitnessCenterRounded style={{ fontSize: "28px" }} />
-          FitTrack
-        </Logo>
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+  };
 
-        <NavLinks>
-          <StyledNavLink to="/" end>
+  return (
+    <>
+      <NavbarContainer>
+        <NavbarLeft>
+          <Logo onClick={() => navigate("/")}>
+            <FitnessCenterRounded style={{ fontSize: "28px" }} />
+            FitTrack
+          </Logo>
+
+          <NavLinks>
+            <StyledNavLink to="/" end>
+              Dashboard
+            </StyledNavLink>
+            <StyledNavLink to="/workouts">Workouts</StyledNavLink>
+            <StyledNavLink to="/tutorials">Tutorials</StyledNavLink>
+            <StyledNavLink to="/blogs">Blogs</StyledNavLink>
+            <StyledNavLink to="/contact">Contact</StyledNavLink>
+          </NavLinks>
+        </NavbarLeft>
+
+        <NavbarRight>
+          <ThemeToggle
+            onClick={toggleTheme}
+            title={isDarkMode ? "Light Mode" : "Dark Mode"}
+          >
+            {isDarkMode ? <LightModeRounded /> : <DarkModeRounded />}
+          </ThemeToggle>
+
+          <UserContainer>
+            <Avatar>
+              {getInitials(currentUser?.user?.name || currentUser?.name)}
+            </Avatar>
+            <UserName>
+              {currentUser?.user?.name || currentUser?.name || "User"}
+            </UserName>
+          </UserContainer>
+
+          <LogoutButton onClick={handleLogout}>
+            <LogoutRounded style={{ fontSize: "18px" }} />
+            <span>Logout</span>
+          </LogoutButton>
+
+          <MobileMenuIcon onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            {mobileMenuOpen ? (
+              <CloseRounded sx={{ fontSize: "28px" }} />
+            ) : (
+              <MenuRounded sx={{ fontSize: "28px" }} />
+            )}
+          </MobileMenuIcon>
+        </NavbarRight>
+      </NavbarContainer>
+
+      {mobileMenuOpen && (
+        <MobileMenu>
+          <StyledNavLink to="/" end onClick={closeMobileMenu}>
             Dashboard
           </StyledNavLink>
-          <StyledNavLink to="/workouts">Workouts</StyledNavLink>
-          <StyledNavLink to="/tutorials">Tutorials</StyledNavLink>
-          <StyledNavLink to="/blogs">Blogs</StyledNavLink>
-          <StyledNavLink to="/contact">Contact</StyledNavLink>
-        </NavLinks>
-      </NavbarLeft>
-
-      <NavbarRight>
-        <UserContainer>
-          <Avatar>
-            {getInitials(currentUser?.user?.name || currentUser?.name)}
-          </Avatar>
-          <UserName>
-            {currentUser?.user?.name || currentUser?.name || "User"}
-          </UserName>
-        </UserContainer>
-
-        <LogoutButton onClick={handleLogout}>
-          <LogoutRounded style={{ fontSize: "18px" }} />
-          Logout
-        </LogoutButton>
-      </NavbarRight>
-    </NavbarContainer>
+          <StyledNavLink to="/workouts" onClick={closeMobileMenu}>
+            Workouts
+          </StyledNavLink>
+          <StyledNavLink to="/tutorials" onClick={closeMobileMenu}>
+            Tutorials
+          </StyledNavLink>
+          <StyledNavLink to="/blogs" onClick={closeMobileMenu}>
+            Blogs
+          </StyledNavLink>
+          <StyledNavLink to="/contact" onClick={closeMobileMenu}>
+            Contact
+          </StyledNavLink>
+        </MobileMenu>
+      )}
+    </>
   );
 };
 

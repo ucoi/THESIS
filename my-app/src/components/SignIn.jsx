@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import styled from "styled-components";
 import TextInput from "./TextInput";
 import Button from "./Button";
@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/reducer/userSlice";
 import { useNavigate } from "react-router-dom";
 import { LoginRounded } from "@mui/icons-material";
+import { ToastContext } from "../App";
 
 const Container = styled.div`
   width: 100%;
@@ -125,6 +126,7 @@ const ErrorMessage = styled.div`
 const SignIn = ({ setLogin }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { addToast } = useContext(ToastContext);
   const [loading, setLoading] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [email, setEmail] = useState("");
@@ -160,20 +162,18 @@ const SignIn = ({ setLogin }) => {
     try {
       const res = await UserSignIn({ email, password });
 
-      // Store token in localStorage
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
       }
 
-      // Dispatch to Redux
       dispatch(loginSuccess(res.data));
-
-      // Navigate to dashboard
+      addToast("success", "Welcome back!", "You've successfully signed in");
       navigate("/");
     } catch (err) {
-      setErrorMessage(
-        err.response?.data?.message || "Login failed. Please try again."
-      );
+      const message =
+        err.response?.data?.message || "Login failed. Please try again.";
+      setErrorMessage(message);
+      addToast("error", "Login Failed", message);
     } finally {
       setLoading(false);
       setButtonDisabled(false);

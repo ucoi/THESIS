@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import styled from "styled-components";
 import TextInput from "./TextInput";
 import Button from "./Button";
@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/reducer/userSlice";
 import { useNavigate } from "react-router-dom";
 import { PersonAddRounded } from "@mui/icons-material";
+import { ToastContext } from "../App";
 
 const Container = styled.div`
   width: 100%;
@@ -143,6 +144,7 @@ const StrengthBar = styled.div`
 const SignUp = ({ setLogin }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { addToast } = useContext(ToastContext);
   const [loading, setLoading] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [name, setName] = useState("");
@@ -199,22 +201,21 @@ const SignUp = ({ setLogin }) => {
     try {
       const res = await UserSignUp({ name, email, password });
 
-      // Store token in localStorage
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
       }
 
-      // Dispatch to Redux
       dispatch(loginSuccess(res.data));
-
       setSuccessMessage("Account created successfully! Redirecting...");
+      addToast("success", "Welcome!", "Your account has been created");
       setTimeout(() => {
         navigate("/");
       }, 1500);
     } catch (err) {
-      setErrorMessage(
-        err.response?.data?.message || "Registration failed. Please try again."
-      );
+      const message =
+        err.response?.data?.message || "Registration failed. Please try again.";
+      setErrorMessage(message);
+      addToast("error", "Registration Failed", message);
     } finally {
       setLoading(false);
       setButtonDisabled(false);
