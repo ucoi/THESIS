@@ -7,6 +7,7 @@ import CategoryChart from "../components/cards/CategoryChart";
 import AddWorkout from "../components/AddWorkout";
 import WorkoutCard from "../components/cards/WorkoutCard";
 import { getDashboardDetails, getWorkouts } from "../api";
+import { useSelector } from "react-redux"; // 👈 ADD THIS
 
 const Container = styled.div`
   flex: 1;
@@ -28,9 +29,20 @@ const Wrapper = styled.div`
 `;
 const Title = styled.div`
   padding: 0px 16px;
-  font-size: 22px;
+  font-size: 28px; // 👈 INCREASED SIZE
   color: ${({ theme }) => theme.text_primary};
-  font-weight: 500;
+  font-weight: 700; // 👈 MADE BOLDER
+
+  span {
+    background: linear-gradient(
+      135deg,
+      ${({ theme }) => theme.primary} 0%,
+      ${({ theme }) => theme.secondary} 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 `;
 const FlexWrap = styled.div`
   display: flex;
@@ -51,6 +63,11 @@ const Section = styled.div`
     gap: 12px;
   }
 `;
+const SectionTitle = styled.div`
+  font-size: 22px;
+  color: ${({ theme }) => theme.text_primary};
+  font-weight: 600;
+`;
 const CardWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -63,6 +80,7 @@ const CardWrapper = styled.div`
 `;
 
 const Dashboard = () => {
+  const { currentUser } = useSelector((state) => state.user); // 👈 ADD THIS
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState();
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -111,10 +129,18 @@ const Dashboard = () => {
     getTodaysWorkout();
   }, []);
 
+  // 👇 ADD THIS - Get first name from user
+  const getFirstName = () => {
+    const fullName = currentUser?.user?.name || currentUser?.name || "User";
+    return fullName.split(" ")[0];
+  };
+
   return (
     <Container>
       <Wrapper>
-        <Title>Dashboard</Title>
+        <Title>
+          Hey, <span>{getFirstName()}</span> 👋
+        </Title>
         <FlexWrap>
           {counts.map((item) => (
             <CountsCard key={item.name} item={item} data={data} />
@@ -131,7 +157,7 @@ const Dashboard = () => {
         </FlexWrap>
 
         <Section>
-          <Title>Todays Workouts</Title>
+          <SectionTitle>Today's Workouts</SectionTitle>
           <CardWrapper>
             {todaysWorkouts.map((workout) => (
               <WorkoutCard
