@@ -2,14 +2,15 @@ import { ThemeProvider, styled } from "styled-components";
 import { lightTheme } from "./utils/Themes";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Authentication from "./pages/Authentication";
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { loginSuccess } from "./redux/reducer/userSlice";
 import Navbar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
 import Workouts from "./pages/Workouts";
-import Tutorials from "./pages/Tutorials"; // 👈 ADD
-import Blogs from "./pages/Blogs"; // 👈 ADD
-import Contact from "./pages/Contact"; // 👈 ADD
+import Tutorials from "./pages/Tutorials";
+import Blogs from "./pages/Blogs";
+import Contact from "./pages/Contact";
 
 const Container = styled.div`
   width: 100%;
@@ -25,6 +26,17 @@ const Container = styled.div`
 
 function App() {
   const { currentUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
+  // Check for token on app load
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token && !currentUser) {
+      // Restore user session from token
+      dispatch(loginSuccess({ token }));
+    }
+  }, [currentUser, dispatch]);
+
   return (
     <ThemeProvider theme={lightTheme}>
       <BrowserRouter>
@@ -32,13 +44,11 @@ function App() {
           <Container>
             <Navbar currentUser={currentUser} />
             <Routes>
-              <Route path="/Dashboard" exact element={<Dashboard />} />
+              <Route path="/" exact element={<Dashboard />} />
               <Route path="/workouts" exact element={<Workouts />} />
-              <Route path="/tutorials" exact element={<Tutorials />} />{" "}
-              {/* 👈 ADD */}
-              <Route path="/blogs" exact element={<Blogs />} /> {/* 👈 ADD */}
-              <Route path="/contact" exact element={<Contact />} />{" "}
-              {/* 👈 ADD */}
+              <Route path="/tutorials" exact element={<Tutorials />} />
+              <Route path="/blogs" exact element={<Blogs />} />
+              <Route path="/contact" exact element={<Contact />} />
             </Routes>
           </Container>
         ) : (

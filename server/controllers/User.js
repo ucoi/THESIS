@@ -10,6 +10,44 @@ import { createError } from "../error.js"; // keep if you use centralized errors
 const JWT_SECRET = process.env.JWT || "replace_with_secure_secret";
 const JWT_EXPIRES = process.env.JWT_EXPIRES || "7d";
 
+/* ------------------------------ LOGIN USER ------------------------------- */
+export const loginUser = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return next(createError(400, "Email and password required"));
+    }
+
+    const user = await User.findOne({ email }).select("+password");
+
+    if (!user) {
+      return next(createError(404, "User not found"));
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordCorrect) {
+      return next(createError(403, "Incorrect password"));
+    }
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT, {
+      expiresIn: "9999 years",
+    });
+
+    return res.status(200).json({
+      token, // 👈 Make sure token is returned
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 /* ----------------------------- REGISTER USER ----------------------------- */
 export const registerUser = async (req, res, next) => {
   try {
@@ -56,56 +94,6 @@ export const registerUser = async (req, res, next) => {
     delete safeUser.__v;
 
     return res.status(201).json({ token, user: safeUser });
-  } catch (err) {
-    next(err);
-  }
-};
-
-/* ------------------------------ LOGIN USER ------------------------------- */
-export const loginUser = async (req, res, next) => {
-  try {
-    const { email, password } = req.body || {};
-    if (!email || !password) {
-      return next(
-        createError
-          ? createError(400, "Email and password are required")
-          : new Error("400: Email and password are required")
-      );
-    }
-
-    const normalizedEmail = String(email).toLowerCase();
-    // include password for comparison
-    const user = await User.findOne({ email: normalizedEmail })
-      .select("+password")
-      .exec();
-    if (!user) {
-      return next(
-        createError
-          ? createError(404, "User not found")
-          : new Error("404: User not found")
-      );
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return next(
-        createError
-          ? createError(403, "Incorrect password")
-          : new Error("403: Incorrect password")
-      );
-    }
-
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES,
-    });
-
-    const safeUser = user.toObject ? user.toObject() : user;
-    safeUser.id = safeUser.id || safeUser._id;
-    delete safeUser._id;
-    delete safeUser.__v;
-    delete safeUser.password;
-
-    return res.status(200).json({ token, user: safeUser });
   } catch (err) {
     next(err);
   }

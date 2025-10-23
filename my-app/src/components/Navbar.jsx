@@ -1,28 +1,11 @@
 import React from "react";
-import { useState } from "react";
 import styled from "styled-components";
-import { Link as LinkR, NavLink } from "react-router-dom";
-import LogoImage from "../utils/Images/Logo.png";
-import { MenuRounded } from "@mui/icons-material";
-import Avatar from "@mui/material/Avatar";
+import { NavLink, useNavigate } from "react-router-dom";
+import { FitnessCenterRounded, LogoutRounded } from "@mui/icons-material";
 import { useDispatch } from "react-redux";
 import { logout } from "../redux/reducer/userSlice";
-import { useNavigate } from "react-router-dom";
 
-const Nav = styled.nav`
-  background: #d3d3d3; /* Darker grey background */
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  color: white;
-  border-bottom: 1px solid ${({ theme }) => theme.text_secondary + 20};
-`;
-const NavContainer = styled.div`
+const NavbarContainer = styled.div`
   width: 100%;
   height: 70px;
   background: ${({ theme }) => theme.card};
@@ -41,41 +24,38 @@ const NavContainer = styled.div`
     padding: 0 16px;
   }
 `;
-const NavLogo = styled(LinkR)`
+
+const NavbarLeft = styled.div`
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 0 6px;
-  font-weight: 600;
-  text-decoration: none;
-  color: ${({ theme }) => theme.black};
+  gap: 32px;
 `;
-const Logo = styled.img`
-  width: 40px;
-  height: 40px;
-`;
-const Mobileicon = styled.div`
-  color: ${({ theme }) => theme.text_primary};
 
-  @media screen and (max-width: 768px) {
-    display: flex;
-    align-items: center;
-  }
-`;
-const NavItems = styled.ul`
-  width: 100%;
+const Logo = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 24px;
-  padding: 0 6px;
-  list-style: none;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.primary};
+  cursor: pointer;
 
-  @media screen and (max-width: 768px) {
-    display: none; /* Hide on smaller screens */
+  &:hover {
+    opacity: 0.8;
   }
 `;
-const Navlink = styled(NavLink)`
+
+const NavLinks = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+const StyledNavLink = styled(NavLink)`
   display: flex;
   align-items: center;
   color: ${({ theme }) => theme.text_secondary};
@@ -97,18 +77,47 @@ const Navlink = styled(NavLink)`
     background: ${({ theme }) => theme.primary + 20};
   }
 `;
-const UserContainer = styled.div`
-  width: 100%;
-  height: 100%;
+
+const NavbarRight = styled.div`
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   gap: 16px;
-  align-items: center;
-  padding: 0 6px;
-  color: ${({ theme }) => theme.primary};
 `;
-const TextButton = styled.button`
+
+const UserContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const Avatar = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    ${({ theme }) => theme.primary} 0%,
+    ${({ theme }) => theme.secondary} 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 16px;
+`;
+
+const UserName = styled.div`
+  font-weight: 600;
+  color: ${({ theme }) => theme.text_primary};
+  font-size: 14px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+const LogoutButton = styled.button`
   padding: 10px 20px;
   background: linear-gradient(
     135deg,
@@ -137,68 +146,60 @@ const TextButton = styled.button`
   }
 `;
 
-const MobileMenu = styled.ul`
-  flex-direction: column;
-  align-items: start;
-  gap: 16px;
-  padding: 12px 40px 24px 40px;
-  list-style: none;
-  width: 90%;
-  background: ${({ theme }) => theme.bg};
-  position: absolute;
-  top: 80px;
-  right: 0;
-  border-radius: 0 0 20px 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-
-  transform: ${({ isOpen }) =>
-    isOpen ? "translateY(0)" : "translateY(-20px)"};
-  opacity: ${({ isOpen }) => (isOpen ? "1" : "0")};
-  pointer-events: ${({ isOpen }) => (isOpen ? "auto" : "none")};
-  transition: transform 0.3s ease, opacity 0.3s ease;
-`;
-
 const Navbar = ({ currentUser }) => {
-  const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     dispatch(logout());
+    localStorage.removeItem("token");
     navigate("/signin");
   };
 
-  return (
-    <Nav>
-      <NavContainer>
-        <Mobileicon onClick={() => setIsOpen(!isOpen)}>
-          <MenuRounded sx={{ color: "inherit", fontSize: "32px" }} />
-        </Mobileicon>
-        <NavLogo to="/">
-          <Logo src={LogoImage} />
-          FT
-        </NavLogo>
+  const getInitials = (name) => {
+    if (!name) return "U";
+    const names = name.split(" ");
+    if (names.length >= 2) {
+      return names[0][0] + names[1][0];
+    }
+    return name[0];
+  };
 
-        <MobileMenu isOpen={isOpen}>
-          <Navlink to="/dashboard">Dashboard</Navlink>
-          <Navlink to="/Workouts">Workouts</Navlink>
-          <Navlink to="/tutorials">tutorials</Navlink>
-          <Navlink to="/blogs">blogs</Navlink>
-          <Navlink to="/contact">contact</Navlink>
-        </MobileMenu>
-        <NavItems>
-          <Navlink to="/dashboard">Dashboard</Navlink>
-          <Navlink to="/Workouts">Workouts</Navlink>
-          <Navlink to="/tutorials">tutorials</Navlink>
-          <Navlink to="/blogs">blogs</Navlink>
-          <Navlink to="/contact">contact</Navlink>
-        </NavItems>
+  return (
+    <NavbarContainer>
+      <NavbarLeft>
+        <Logo onClick={() => navigate("/")}>
+          <FitnessCenterRounded style={{ fontSize: "28px" }} />
+          FitTrack
+        </Logo>
+
+        <NavLinks>
+          <StyledNavLink to="/" end>
+            Dashboard
+          </StyledNavLink>
+          <StyledNavLink to="/workouts">Workouts</StyledNavLink>
+          <StyledNavLink to="/tutorials">Tutorials</StyledNavLink>
+          <StyledNavLink to="/blogs">Blogs</StyledNavLink>
+          <StyledNavLink to="/contact">Contact</StyledNavLink>
+        </NavLinks>
+      </NavbarLeft>
+
+      <NavbarRight>
         <UserContainer>
-          <Avatar src={currentUser?.img}>{currentUser?.name[0]}</Avatar>
-          <TextButton onClick={handleLogout}>Logout</TextButton>
+          <Avatar>
+            {getInitials(currentUser?.user?.name || currentUser?.name)}
+          </Avatar>
+          <UserName>
+            {currentUser?.user?.name || currentUser?.name || "User"}
+          </UserName>
         </UserContainer>
-      </NavContainer>
-    </Nav>
+
+        <LogoutButton onClick={handleLogout}>
+          <LogoutRounded style={{ fontSize: "18px" }} />
+          Logout
+        </LogoutButton>
+      </NavbarRight>
+    </NavbarContainer>
   );
 };
 

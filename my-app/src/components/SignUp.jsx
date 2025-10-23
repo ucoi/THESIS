@@ -6,82 +6,217 @@ import { UserSignUp } from "../api";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/reducer/userSlice";
 import { useNavigate } from "react-router-dom";
+import { PersonAddRounded } from "@mui/icons-material";
 
 const Container = styled.div`
   width: 100%;
-  max-width: 500px;
+  max-width: 450px;
+  padding: 40px;
   display: flex;
   flex-direction: column;
-  gap: 36px;
+  gap: 28px;
   background: ${({ theme }) => theme.card};
-  padding: 40px 32px;
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  border-radius: 20px;
+  box-shadow: ${({ theme }) => theme.shadow_lg};
 
-  @media (max-width: 600px) {
-    padding: 28px 20px;
-    gap: 28px;
+  @media (max-width: 700px) {
+    padding: 30px 24px;
+    gap: 24px;
   }
 `;
 
-const Title = styled.h2`
-  font-size: 30px;
+const Title = styled.div`
+  font-size: 32px;
   font-weight: 800;
   color: ${({ theme }) => theme.text_primary};
-  margin: 0;
+
+  @media (max-width: 700px) {
+    font-size: 28px;
+  }
 `;
 
-const Span = styled.p`
-  font-size: 16px;
-  font-weight: 400;
-  color: ${({ theme }) => theme.text_secondary + 90};
-  margin-top: 8px;
+const Subtitle = styled.div`
+  font-size: 14px;
+  color: ${({ theme }) => theme.text_secondary};
+  margin-top: -16px;
+  font-weight: 500;
 `;
 
-const Form = styled.div`
+const Form = styled.form`
   display: flex;
   flex-direction: column;
   gap: 20px;
 `;
 
-const SignUp = () => {
+const Divider = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: ${({ theme }) => theme.text_secondary}30;
+  }
+
+  span {
+    font-size: 13px;
+    color: ${({ theme }) => theme.text_secondary};
+    font-weight: 500;
+  }
+`;
+
+const AccountText = styled.div`
+  font-size: 14px;
+  color: ${({ theme }) => theme.text_secondary};
+  text-align: center;
+
+  span {
+    color: ${({ theme }) => theme.primary};
+    font-weight: 700;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;
+
+const ErrorMessage = styled.div`
+  padding: 12px;
+  border-radius: 10px;
+  background: ${({ theme }) => theme.red}20;
+  color: ${({ theme }) => theme.red};
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  animation: shake 0.3s ease;
+
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-10px);
+    }
+    75% {
+      transform: translateX(10px);
+    }
+  }
+`;
+
+const SuccessMessage = styled.div`
+  padding: 12px;
+  border-radius: 10px;
+  background: ${({ theme }) => theme.green}20;
+  color: ${({ theme }) => theme.green};
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+`;
+
+const PasswordStrength = styled.div`
+  display: flex;
+  gap: 4px;
+  margin-top: -12px;
+`;
+
+const StrengthBar = styled.div`
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: ${({ active, theme, level }) =>
+    active
+      ? level === "weak"
+        ? theme.red
+        : level === "medium"
+        ? theme.orange
+        : theme.green
+      : theme.text_secondary}30;
+  transition: all 0.3s ease;
+`;
+
+const SignUp = ({ setLogin }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [buttonLoading, setButtonLoading] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const getPasswordStrength = (pass) => {
+    if (pass.length < 6) return { level: "weak", bars: 1 };
+    if (pass.length < 10) return { level: "medium", bars: 2 };
+    return { level: "strong", bars: 3 };
+  };
+
+  const passwordStrength = getPasswordStrength(password);
 
   const validateInputs = () => {
     if (!name || !email || !password) {
-      alert("⚠️ Please fill in all fields");
+      setErrorMessage("Please fill in all fields");
       return false;
     }
+
+    if (name.length < 2) {
+      setErrorMessage("Name must be at least 2 characters");
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrorMessage("Please enter a valid email address");
+      return false;
+    }
+
+    if (password.length < 6) {
+      setErrorMessage("Password must be at least 6 characters");
+      return false;
+    }
+
     return true;
   };
 
-  const handleSignUp = async () => {
-    if (!validateInputs()) return;
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    setErrorMessage("");
+    setSuccessMessage("");
 
-    setButtonLoading(true);
+    if (!validateInputs()) {
+      return;
+    }
+
+    setLoading(true);
     setButtonDisabled(true);
+
     try {
       const res = await UserSignUp({ name, email, password });
 
-      // Store token in Redux and localStorage
-      dispatch(loginSuccess({ token: res.data.token, user: res.data.user }));
-      localStorage.setItem("token", res.data.token);
+      // Store token in localStorage
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+      }
 
-      alert("Account Created Successfully");
-      navigate("/dashboard");
+      // Dispatch to Redux
+      dispatch(loginSuccess(res.data));
+
+      setSuccessMessage("Account created successfully! Redirecting...");
+      setTimeout(() => {
+        navigate("/");
+      }, 1500);
     } catch (err) {
-      console.error("SignUp error:", err);
-      alert(err.response?.data?.message || "Signup failed");
+      setErrorMessage(
+        err.response?.data?.message || "Registration failed. Please try again."
+      );
     } finally {
-      setButtonLoading(false);
+      setLoading(false);
       setButtonDisabled(false);
     }
   };
@@ -89,37 +224,71 @@ const SignUp = () => {
   return (
     <Container>
       <div>
-        <Title>Create a New Account 👋</Title>
-        <Span>Join FitTrack today and start your fitness journey</Span>
+        <Title>Create Account</Title>
+        <Subtitle>Join thousands of fitness enthusiasts today</Subtitle>
       </div>
 
-      <Form>
+      <Form onSubmit={handleSignUp}>
         <TextInput
           label="Full Name"
-          placeholder="Enter your full name"
+          placeholder="Enter your name"
           value={name}
           handleChange={(e) => setName(e.target.value)}
         />
+
         <TextInput
           label="Email Address"
-          placeholder="Enter your email address"
+          placeholder="Enter your email"
           value={email}
           handleChange={(e) => setEmail(e.target.value)}
         />
-        <TextInput
-          label="Password"
-          placeholder="Enter your password"
-          password
-          value={password}
-          handleChange={(e) => setPassword(e.target.value)}
-        />
+
+        <div>
+          <TextInput
+            label="Password"
+            placeholder="Create a password"
+            password
+            value={password}
+            handleChange={(e) => setPassword(e.target.value)}
+          />
+          {password && (
+            <PasswordStrength>
+              <StrengthBar
+                active={passwordStrength.bars >= 1}
+                level={passwordStrength.level}
+              />
+              <StrengthBar
+                active={passwordStrength.bars >= 2}
+                level={passwordStrength.level}
+              />
+              <StrengthBar
+                active={passwordStrength.bars >= 3}
+                level={passwordStrength.level}
+              />
+            </PasswordStrength>
+          )}
+        </div>
+
+        {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
+        {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
+
         <Button
-          text="Sign Up"
-          onClick={handleSignUp}
-          isLoading={buttonLoading}
+          text="Create Account"
+          leftIcon={<PersonAddRounded />}
+          type="submit"
+          isLoading={loading}
           isDisabled={buttonDisabled}
         />
       </Form>
+
+      <Divider>
+        <span>OR</span>
+      </Divider>
+
+      <AccountText>
+        Already have an account?{" "}
+        <span onClick={() => setLogin(true)}>Sign In</span>
+      </AccountText>
     </Container>
   );
 };
