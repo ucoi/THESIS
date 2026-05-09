@@ -165,10 +165,6 @@ const MilestoneText = styled.div`
 
 const StreakCard = ({ streak = 0, lastWorkout = null }) => {
   // Calculate if workout was today
-  const isToday =
-    lastWorkout &&
-    new Date(lastWorkout).toDateString() === new Date().toDateString();
-
   const getMessage = (days) => {
     if (days === 0) return "Start your streak today! 🚀";
     if (days === 1) return "Great start! Keep it going! 💪";

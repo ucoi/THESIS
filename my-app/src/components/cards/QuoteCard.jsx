@@ -2,6 +2,57 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { FormatQuoteRounded, RefreshRounded } from "@mui/icons-material";
 
+const quotes = [
+  {
+    text: "The only bad workout is the one that didn't happen.",
+    author: "Unknown",
+  },
+  {
+    text: "Success is the sum of small efforts repeated day in and day out.",
+    author: "Robert Collier",
+  },
+  {
+    text: "Your body can stand almost anything. It's your mind you have to convince.",
+    author: "Unknown",
+  },
+  {
+    text: "The pain you feel today will be the strength you feel tomorrow.",
+    author: "Arnold Schwarzenegger",
+  },
+  {
+    text: "Take care of your body. It's the only place you have to live.",
+    author: "Jim Rohn",
+  },
+  {
+    text: "The hard days are what make you stronger.",
+    author: "Aly Raisman",
+  },
+  {
+    text: "Don't count the days, make the days count.",
+    author: "Muhammad Ali",
+  },
+  {
+    text: "Fitness is not about being better than someone else. It's about being better than you used to be.",
+    author: "Khloe Kardashian",
+  },
+  {
+    text: "The only person you are destined to become is the person you decide to be.",
+    author: "Ralph Waldo Emerson",
+  },
+  {
+    text: "Push yourself because no one else is going to do it for you.",
+    author: "Unknown",
+  },
+  {
+    text: "Fall in love with taking care of yourself.",
+    author: "Unknown",
+  },
+  {
+    text: "You don't have to be extreme, just consistent.",
+    author: "Unknown",
+  },
+];
+
 const Card = styled.div`
   flex: 1;
   min-width: 280px;
@@ -95,57 +146,6 @@ const RefreshButton = styled.button`
 `;
 
 const QuoteCard = () => {
-  const quotes = [
-    {
-      text: "The only bad workout is the one that didn't happen.",
-      author: "Unknown",
-    },
-    {
-      text: "Success is the sum of small efforts repeated day in and day out.",
-      author: "Robert Collier",
-    },
-    {
-      text: "Your body can stand almost anything. It's your mind you have to convince.",
-      author: "Unknown",
-    },
-    {
-      text: "The pain you feel today will be the strength you feel tomorrow.",
-      author: "Arnold Schwarzenegger",
-    },
-    {
-      text: "Take care of your body. It's the only place you have to live.",
-      author: "Jim Rohn",
-    },
-    {
-      text: "The hard days are what make you stronger.",
-      author: "Aly Raisman",
-    },
-    {
-      text: "Don't count the days, make the days count.",
-      author: "Muhammad Ali",
-    },
-    {
-      text: "Fitness is not about being better than someone else. It's about being better than you used to be.",
-      author: "Khloe Kardashian",
-    },
-    {
-      text: "The only person you are destined to become is the person you decide to be.",
-      author: "Ralph Waldo Emerson",
-    },
-    {
-      text: "Push yourself because no one else is going to do it for you.",
-      author: "Unknown",
-    },
-    {
-      text: "Fall in love with taking care of yourself.",
-      author: "Unknown",
-    },
-    {
-      text: "You don't have to be extreme, just consistent.",
-      author: "Unknown",
-    },
-  ];
-
   const [currentQuote, setCurrentQuote] = useState(quotes[0]);
 
   useEffect(() => {

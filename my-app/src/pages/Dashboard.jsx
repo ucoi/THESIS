@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import { counts } from "../utils/data";
 import CountsCard from "../components/cards/CountCard";
@@ -115,21 +115,26 @@ const EmptyState = styled.div`
 
 const Dashboard = () => {
   const { currentUser } = useSelector((state) => state.user);
-  const [loading, setLoading] = useState(false);
   const [data, setData] = useState();
-  const [buttonLoading, setButtonLoading] = useState(false);
+  const [buttonLoading] = useState(false);
   const [todaysWorkouts, setTodaysWorkouts] = useState([]);
   const [streak, setStreak] = useState(0);
   const [weeklyWorkouts, setWeeklyWorkouts] = useState(0);
 
-  const dashboardData = async () => {
-    setLoading(true);
+  const calculateStreak = useCallback((dashboardData) => {
+    const currentStreak = dashboardData?.totalWorkouts
+      ? Math.min(dashboardData.totalWorkouts, 100)
+      : 0;
+    setStreak(currentStreak);
+  }, []);
+
+  const dashboardData = useCallback(async () => {
     try {
       const res = await getDashboardDetails();
       console.log("Dashboard data refreshed:", res.data);
       setData(res.data);
 
-      // Calculate streak (you can enhance this with backend data)
+      // Calculate streak (you can enhance this)
       calculateStreak(res.data);
 
       // Calculate weekly workouts
@@ -137,35 +142,18 @@ const Dashboard = () => {
     } catch (err) {
       console.error("Dashboard error:", err);
       alert(err?.response?.data?.message || "Failed to load dashboard");
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [calculateStreak]);
 
-  const getTodaysWorkout = async () => {
-    setLoading(true);
+  const getTodaysWorkout = useCallback(async () => {
     try {
       const res = await getWorkouts("");
       console.log("Today's workouts refreshed:", res?.data?.todaysWorkouts);
       setTodaysWorkouts(res?.data?.todaysWorkouts || []);
     } catch (err) {
       console.error("Get workouts error:", err);
-    } finally {
-      setLoading(false);
     }
-  };
-
-  const calculateStreak = (dashboardData) => {
-    // Simple streak calculation - you can enhance this
-    // For now, if there are workouts today, increment streak
-    const hasWorkoutToday = todaysWorkouts.length > 0;
-
-    
-    const currentStreak = dashboardData?.totalWorkouts
-      ? Math.min(dashboardData.totalWorkouts, 100)
-      : 0;
-    setStreak(currentStreak);
-  };
+  }, []);
 
   const addNewWorkout = async () => {
     console.log("addNewWorkout callback triggered");
@@ -181,7 +169,7 @@ const Dashboard = () => {
   useEffect(() => {
     dashboardData();
     getTodaysWorkout();
-  }, []);
+  }, [dashboardData, getTodaysWorkout]);
 
   const getFirstName = () => {
     const fullName = currentUser?.user?.name || currentUser?.name || "User";

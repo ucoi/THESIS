@@ -3,7 +3,6 @@ import styled from "styled-components";
 import {
   CloseRounded,
   AccessTimeRounded,
-  PersonRounded,
   CalendarTodayRounded,
   BookmarkBorderRounded,
   ShareRounded,

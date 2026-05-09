@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import WorkoutCard from "../components/cards/WorkoutCard";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -75,7 +75,7 @@ const Workouts = () => {
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState("");
 
-  const getWorkoutsForDate = async () => {
+  const getWorkoutsForDate = useCallback(async () => {
     setLoading(true);
     try {
       const res = await getWorkouts(date ? `?date=${date}` : "");
@@ -87,7 +87,7 @@ const Workouts = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [date]);
 
   const handleDeleteWorkout = async () => {
     await getWorkoutsForDate();
@@ -95,7 +95,7 @@ const Workouts = () => {
 
   useEffect(() => {
     getWorkoutsForDate();
-  }, [date]);
+  }, [getWorkoutsForDate]);
 
   return (
     <Container>

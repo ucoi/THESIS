@@ -151,7 +151,7 @@ const AddWorkout = ({ addNewWorkout, buttonLoading }) => {
     };
 
     try {
-      const res = await apiAddWorkout(payload);
+      await apiAddWorkout(payload);
       setFeedback({ message: "Workout added successfully! 💪", success: true });
 
       setWorkoutName("");
