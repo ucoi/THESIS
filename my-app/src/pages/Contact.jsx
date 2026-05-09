@@ -199,7 +199,7 @@ const Contact = () => {
               <InfoContent>
                 <InfoTitle>Email Us</InfoTitle>
                 <InfoText>
-                  support@fittrack.com
+                  Ahmed@fittrack.com
                   <br />
                   Available 24/7
                 </InfoText>
@@ -213,9 +213,9 @@ const Contact = () => {
               <InfoContent>
                 <InfoTitle>Call Us</InfoTitle>
                 <InfoText>
-                  +1 (555) 123-4567
+                  +36 790 2021 8
                   <br />
-                  Mon-Fri: 9AM - 6PM EST
+                  Mon-Fri: 9AM - 6PM
                 </InfoText>
               </InfoContent>
             </InfoCard>
@@ -229,9 +229,9 @@ const Contact = () => {
                 <InfoText>
                   123 Fitness Street
                   <br />
-                  New York, NY 10001
+                  debrecen
                   <br />
-                  United States
+                  Hajdu bihar, 4028
                 </InfoText>
               </InfoContent>
             </InfoCard>

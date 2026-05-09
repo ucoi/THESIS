@@ -160,8 +160,7 @@ const Dashboard = () => {
     // For now, if there are workouts today, increment streak
     const hasWorkoutToday = todaysWorkouts.length > 0;
 
-    // This is a placeholder - in production, you'd calculate this on backend
-    // based on consecutive days with workouts
+    
     const currentStreak = dashboardData?.totalWorkouts
       ? Math.min(dashboardData.totalWorkouts, 100)
       : 0;
