@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: "https://fitness-tracker-api-1ynm.onrender.com",
 });
 
 // Add token to every request automatically
