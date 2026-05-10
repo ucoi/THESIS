@@ -138,6 +138,14 @@ export const getUserDashboard = async (req, res, next) => {
     const avgCaloriesBurntPerWorkout =
       totalWorkouts > 0 ? totalCaloriesBurnt / totalWorkouts : 0;
 
+    // 🔹 Total duration today
+    const totalDurationAgg = await Workout.aggregate([
+      { $match: { user: user._id, date: { $gte: startToday, $lt: endToday } } },
+      { $group: { _id: null, totalDuration: { $sum: "$duration" } } },
+    ]);
+    const totalDuration = totalDurationAgg[0]?.totalDuration || 0;
+    const avgDuration = totalWorkouts > 0 ? totalDuration / totalWorkouts : 0;
+
     // 🔹 Calories by category (for Pie Chart)
     const categoryCalories = await Workout.aggregate([
       { $match: { user: user._id, date: { $gte: startToday, $lt: endToday } } },
@@ -191,6 +199,7 @@ export const getUserDashboard = async (req, res, next) => {
       totalCaloriesBurnt,
       totalWorkouts,
       avgCaloriesBurntPerWorkout,
+      avgDuration,
       totalWeeksCaloriesBurnt: { weeks, caloriesBurned: caloriesBurnt },
       pieChartData,
     });

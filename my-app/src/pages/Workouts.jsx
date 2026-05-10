@@ -22,8 +22,9 @@ const Wrapper = styled.div`
   gap: 22px;
   padding: 0px 16px;
   @media (max-width: 600px) {
-    gap: 12px;
+    gap: 16px;
     flex-direction: column;
+    padding: 0px 12px;
   }
 `;
 const Left = styled.div`
@@ -33,6 +34,11 @@ const Left = styled.div`
   border: 1px solid ${({ theme }) => theme.text_primary + 20};
   border-radius: 14px;
   box-shadow: 1px 6px 20px 0px ${({ theme }) => theme.primary + 15};
+  @media (max-width: 600px) {
+    flex: 1;
+    width: 100%;
+    padding: 16px;
+  }
 `;
 const Title = styled.div`
   font-weight: 600;
@@ -44,6 +50,9 @@ const Title = styled.div`
 `;
 const Right = styled.div`
   flex: 1;
+  @media (max-width: 600px) {
+    width: 100%;
+  }
 `;
 const CardWrapper = styled.div`
   display: flex;

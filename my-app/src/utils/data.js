@@ -19,8 +19,8 @@ export const counts = [
     name: "Average Duration",
     icon: <TimelapseRounded />,
     value: (data) => {
-      const avgMinutes = data?.avgCaloriesBurntPerWorkout || 0;
+      const avgMinutes = data?.avgDuration || 0;
       return `${avgMinutes.toFixed(0)} min`;
-    }, // 👈 Changed to function
+    },
   },
 ];

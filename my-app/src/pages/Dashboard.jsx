@@ -57,7 +57,11 @@ const FlexWrap = styled.div`
   gap: 22px;
   padding: 0px 16px;
   @media (max-width: 600px) {
-    gap: 12px;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 14px;
+    padding: 0px 12px;
   }
 `;
 
@@ -67,7 +71,8 @@ const Section = styled.div`
   padding: 0px 16px;
   gap: 22px;
   @media (max-width: 600px) {
-    gap: 12px;
+    padding: 0px 12px;
+    gap: 16px;
   }
 `;
 
@@ -84,7 +89,10 @@ const CardWrapper = styled.div`
   gap: 20px;
   margin-bottom: 100px;
   @media (max-width: 600px) {
-    gap: 12px;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 60px;
   }
 `;
 
@@ -111,6 +119,17 @@ const EmptyState = styled.div`
     font-size: 64px;
     margin-bottom: 16px;
   }
+`;
+
+const NewUserBanner = styled.div`
+  margin: 0 16px 24px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: ${({ theme }) => theme.primary}15;
+  border: 1px dashed ${({ theme }) => theme.primary};
+  color: ${({ theme }) => theme.text_primary};
+  font-weight: 600;
+  text-align: center;
 `;
 
 const Dashboard = () => {
@@ -182,6 +201,12 @@ const Dashboard = () => {
         <Title>
           Hey, <span>{getFirstName()}</span> 👋
         </Title>
+
+        {data?.totalWorkouts === 0 && data !== undefined && (
+          <NewUserBanner>
+            Welcome! Add your first workout to start tracking your progress.
+          </NewUserBanner>
+        )}
 
         {/* Stats Cards Row */}
         <FlexWrap>
