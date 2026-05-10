@@ -16,13 +16,13 @@ import React from "react";
 
 const Container = styled.div`
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: ${({ theme }) => theme.bg};
   color: ${({ theme }) => theme.text_primary};
   overflow-x: hidden;
-  overflow-y: hidden;
+  overflow-y: auto;
   transition: all 0.2s ease;
 `;
 

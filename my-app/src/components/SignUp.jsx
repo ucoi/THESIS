@@ -13,6 +13,8 @@ const Container = styled.div`
   width: 100%;
   max-width: 450px;
   padding: 40px;
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 28px;
@@ -23,6 +25,10 @@ const Container = styled.div`
   @media (max-width: 700px) {
     padding: 30px 24px;
     gap: 24px;
+    max-width: 100%;
+  }
+  @media (max-width: 500px) {
+    padding: 24px 16px;
   }
 `;
 

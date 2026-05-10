@@ -6,18 +6,20 @@ import { FitnessCenterRounded } from "@mui/icons-material";
 
 const Container = styled.div`
   flex: 1;
-  height: 100%;
+  min-height: 100vh;
   display: flex;
   background: linear-gradient(
     135deg,
     ${({ theme }) => theme.primary}20 0%,
     ${({ theme }) => theme.secondary}20 100%
   );
-  overflow: hidden;
+  overflow: auto;
   position: relative;
 
   @media (max-width: 700px) {
     flex-direction: column;
+    align-items: stretch;
+    padding: 20px 0;
   }
 `;
 
@@ -34,6 +36,8 @@ const Left = styled.div`
   @media (max-width: 700px) {
     padding: 30px 20px;
     min-height: 300px;
+    width: 100%;
+    max-width: none;
   }
 `;
 
@@ -46,6 +50,9 @@ const Right = styled.div`
 
   @media (max-width: 700px) {
     padding: 30px 20px;
+    width: 100%;
+    max-width: none;
+    align-items: stretch;
   }
 `;
 
@@ -87,6 +94,7 @@ const BrandSubtitle = styled.p`
   color: ${({ theme }) => theme.text_secondary};
   text-align: center;
   max-width: 400px;
+  width: 100%;
   line-height: 1.6;
   margin-bottom: 40px;
 
@@ -100,6 +108,7 @@ const FeatureList = styled.div`
   flex-direction: column;
   gap: 16px;
   max-width: 400px;
+  width: 100%;
 `;
 
 const Feature = styled.div`
